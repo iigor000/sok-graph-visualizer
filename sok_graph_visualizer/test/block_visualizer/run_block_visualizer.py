@@ -27,7 +27,7 @@ from sok_graph_visualizer.api.model.Node import Node as ApiNode
 from sok_graph_visualizer.api.model.Edge import Edge as ApiEdge
 
 # Import the BlockVisualizer renderer (the visualizer is responsible only for rendering)
-from sok_graph_visualizer.block_visualizer.block_visualizer import BlockVisualizer
+from sok_graph_visualizer.block_visualizer.src.block_visualizer import BlockVisualizer
 
 
 def build_sample_graph() -> Graph:
