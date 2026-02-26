@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Graph Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #main {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="main"></div>
+<script>
+
+const NODE_RADIUS = 20;
+const LINK_DISTANCE = 150;
+const CHARGE_STRENGTH = -300;
+
+var nodes = [
+
+    { id: "A", name: "Node A" },
+
+    { id: "B", name: "Node B" },
+
+    { id: "C", name: "Node C" },
+
+    { id: "D", name: "Node D" },
+
+    { id: "E", name: "Node E" },
+
+    { id: "F", name: "Node F" },
+
+    { id: "G", name: "Node G" },
+
+    { id: "H", name: "Node H" },
+
+    { id: "I", name: "Node I" },
+
+    { id: "J", name: "Node J" },
+
+];
+
+var links = [
+
+    
+    {
+        source: "A",
+        target: "B",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "A",
+        target: "C",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "A",
+        target: "D",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "A",
+        target: "E",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "B",
+        target: "F",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "C",
+        target: "G",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "D",
+        target: "H",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "E",
+        target: "I",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "F",
+        target: "G",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "G",
+        target: "H",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "H",
+        target: "I",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "I",
+        target: "F",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "F",
+        target: "J",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "J",
+        target: "A",
+        curved: false
+    },
+    
+
+    
+    {
+        source: "B",
+        target: "C",
+        curved: true
+    },
+    
+
+    
+    {
+        source: "C",
+        target: "B",
+        curved: true
+    },
+    
+
+];
+
+var selfLoops = [
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+];
+
+var parentDiv = d3.select("#main");
+var width = parentDiv.node().getBoundingClientRect().width;
+var height = parentDiv.node().getBoundingClientRect().height;
+
+var svg = parentDiv.append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%");
+
+// Arrow marker definition (must be defined before container)
+svg.append("defs")
+    .append("marker")
+    .attr("id", "arrowhead")
+    .attr("viewBox", "0 0 10 10")
+    .attr("refX", 25)
+    .attr("refY", 5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M 0 0 L 10 5 L 0 10 z")
+    .attr("fill", "#999");
+
+var container = svg.append("g");
+
+
+// Standard zoom
+svg.call(
+    d3.zoom()
+        .scaleExtent([0.2, 5])
+        .on("zoom", (event) => {
+            container.attr("transform", event.transform);
+        })
+);
+
+
+// Node lookup map
+var nodeMap = {};
+nodes.forEach(n => nodeMap[n.id] = n);
+
+
+// Force simulation
+var simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links)
+        .id(d => d.id)
+        .distance(LINK_DISTANCE))
+    .force("charge", d3.forceManyBody().strength(CHARGE_STRENGTH))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("collide", d3.forceCollide(NODE_RADIUS + 5));
+
+
+// LINKS
+var link = container.append("g")
+    .selectAll("path")
+    .data(links)
+    .enter()
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "#999")
+    .attr("stroke-width", 2)
+    .attr("stroke-opacity", 0.6)
+    .attr("marker-end", "url(#arrowhead)");
+
+
+// SELF LOOPS
+var selfLoop = container.append("g")
+    .selectAll("path")
+    .data(selfLoops)
+    .enter()
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "#999")
+    .attr("stroke-opacity", 0.6);
+
+
+// NODES
+var node = container.append("g")
+    .selectAll("circle")
+    .data(nodes)
+    .enter()
+    .append("circle")
+    .attr("r", NODE_RADIUS)
+    .attr("fill", "black")
+    .call(
+        d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+    )
+    .on("click", function(event, d) {
+
+        node.attr("fill", "black");
+        d3.select(this).attr("fill", "red");
+
+        document.dispatchEvent(
+            new CustomEvent("node-clicked", { detail: d.id })
+        );
+    });
+
+
+// TEXT
+var text = container.append("g")
+    .selectAll("text")
+    .data(nodes)
+    .enter()
+    .append("text")
+    .text(d => d.name)
+    .attr("fill", "#fff")
+    .attr("font-size", "12px")
+    .attr("text-anchor", "middle")
+    .attr("dy", ".35em");
+
+
+// TICK
+simulation.on("tick", () => {
+
+    link.attr("d", function(d) {
+
+        if (d.curved) {
+            var dx = d.target.x - d.source.x;
+            var dy = d.target.y - d.source.y;
+            var dr = Math.sqrt(dx * dx + dy * dy);
+
+            return `
+                M ${d.source.x},${d.source.y}
+                A ${dr},${dr}
+                0 0,1
+                ${d.target.x},${d.target.y}
+            `;
+        }
+
+        return `
+            M ${d.source.x},${d.source.y}
+            L ${d.target.x},${d.target.y}
+        `;
+    });
+
+    selfLoop.attr("d", function(d) {
+        var n = nodeMap[d.source];
+        var x = n.x;
+        var y = n.y;
+
+        return `
+            M ${x + NODE_RADIUS},${y}
+            A ${NODE_RADIUS * 1.5},${NODE_RADIUS * 1.5}
+            0 1,0
+            ${x - NODE_RADIUS},${y}
+        `;
+    });
+
+    node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+
+    text
+        .attr("x", d => d.x)
+        .attr("y", d => d.y);
+});
+
+
+// DRAG
+function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+}
+
+function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+}
+
+function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+}
+
+
+// RESIZE
+window.addEventListener("resize", function () {
+
+    width = parentDiv.node().getBoundingClientRect().width;
+    height = parentDiv.node().getBoundingClientRect().height;
+
+    simulation.force("center", d3.forceCenter(width / 2, height / 2));
+    simulation.alpha(1).restart();
+});
+
+</script>
+</body>
+</html>
