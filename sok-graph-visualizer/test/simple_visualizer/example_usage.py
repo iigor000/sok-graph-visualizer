@@ -1,6 +1,8 @@
 """
 Example usage of SimpleVisualizer.
 This script creates a simple graph and visualizes it.
+Open the generated HTML file in a browser to see the visualization.
+http://localhost:8000/test/simple_visualizer/graph_visualization.html
 """
 
 import sys
@@ -12,8 +14,8 @@ sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "simple_visualizer" / "src"))
 
 from api.model.Graph import Graph
-from api.model.abstract.Node import Node
-from api.model.abstract.Edge import Edge
+from api.model.Node import Node
+from api.model.Edge import Edge
 from simple_visualizer import SimpleVisualizer
 
 

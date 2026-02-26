@@ -1,5 +1,5 @@
-from api.model.abstract.Edge import Edge
-from api.model.abstract.Node import Node
+from api.model.Edge import Edge
+from api.model.Node import Node
 from typing import Dict, Optional, Set, List
 from copy import deepcopy
 
