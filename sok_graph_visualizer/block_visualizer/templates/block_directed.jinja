@@ -1,0 +1,197 @@
+// Script fragment for directed block visualization (with arrows and bidirectional handling)
+// Assumes a div with id="main" exists and D3 is already loaded
+
+// Build arrays from API model dicts
+var nodes = [
+  {% for nid, node in graph_nodes.items() %}
+    { id: "{{ nid }}", name: "{{ node.attributes.get('name', node.node_id) }}", attr: {{ node.attributes | tojson }} },
+  {% endfor %}
+];
+
+// Build links and detect bidirectional pairs
+var raw_edges = [
+  {% for eid, e in graph_edges.items() %}
+    { id: "{{ eid }}", source: "{{ e.source }}", target: "{{ e.target }}" },
+  {% endfor %}
+];
+
+// compute bidirectional flag by checking for reverse edges
+var links = raw_edges.map(function(e) {
+  var rev = raw_edges.find(function(x) { return x.source === e.target && x.target === e.source; });
+  return { source: e.source, target: e.target, both: !!rev };
+});
+
+var parentDiv = d3.select('#main');
+var parentWidth = parentDiv.node().clientWidth;
+var parentHeight = parentDiv.node().clientHeight;
+
+var svg = parentDiv.append('svg')
+  .attr('width', '100%')
+  .attr('height', '100%')
+  .attr('viewBox', '0 0 ' + parentWidth + ' ' + parentHeight)
+  .style('cursor', 'grab');
+
+// define arrow markers
+svg.append('defs').selectAll('marker')
+  .data(['arrow'])
+  .enter().append('marker')
+  .attr('id', d => d)
+  .attr('viewBox', '0 -5 10 10')
+  .attr('refX', 15)
+  .attr('refY', 0)
+  .attr('markerWidth', 6)
+  .attr('markerHeight', 6)
+  .attr('orient', 'auto')
+  .append('path')
+  .attr('d', 'M0,-5L10,0L0,5')
+  .attr('fill', '#5a5a5a');
+
+const container = svg.append('g');
+
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d => d.id).distance(260))
+  .force('x', d3.forceX(parentWidth / 2).strength(0.01))
+  .force('y', d3.forceY(parentHeight / 2).strength(0.01))
+  .force('collide', d3.forceCollide().radius(() => 80).iterations(1));
+
+// Use paths so we can draw arcs for bidirectional
+var link = container.append('g')
+  .selectAll('path')
+  .data(links)
+  .enter().append('path')
+  .attr('class', 'link')
+  .attr('marker-end', d => d.both ? null : 'url(#arrow)')
+  .attr('marker-start', d => d.both ? 'url(#arrow)' : null);
+
+// Node groups (re-using rectangle layout from block template)
+const lineHeight = 16;
+const padX = 12;
+const padY = 8;
+
+const node = container.append('g')
+  .selectAll('g')
+  .data(nodes)
+  .enter().append('g')
+  .attr('class', 'node')
+  .call(d3.drag()
+    .on('start', dragstarted)
+    .on('drag', dragged)
+    .on('end', dragended))
+  .on('click', function(event, d) {
+    svg.selectAll('rect').attr('fill', '#000');
+    d3.select(this).select('rect').attr('fill', 'red');
+    const startEvent = new CustomEvent('node-clicked', { detail: d.id });
+    d3.select('body').node().ownerDocument.dispatchEvent(startEvent);
+  });
+
+node.each(function(d) {
+  const g = d3.select(this);
+  const lines = [];
+
+  // First line: node id (centered)
+  lines.push(d.id);
+  // Second line: visual separator (centered)
+  lines.push('────────');
+  // Third line: display name
+  lines.push('name:' + d.name);
+  for (const [k, v] of Object.entries(d.attr || {})) lines.push(`${k}: ${v}`);
+
+  lines.forEach((txt, i) => {
+    g.append('text')
+     .text(txt)
+     .attr('fill', '#fff')
+     .attr('font-size', 12)
+     .attr('font-family', 'Arial, Helvetica, sans-serif')
+     .attr('x', 0)
+     .attr('y', i * lineHeight);
+  });
+
+  const bbox = g.node().getBBox();
+  const rectX = bbox.x - padX;
+  const rectY = bbox.y - padY;
+    const rectW = bbox.width + padX * 2; // width of the rectangle
+    const rectH = bbox.height + padY * 2; // height of the rectangle
+
+    // center rect at group origin so node (d.x,d.y) is rectangle center
+    g.insert('rect', ':first-child')
+      .attr('class', 'node-rect')
+      .attr('x', -rectW/2)
+      .attr('y', -rectH/2)
+      .attr('width', rectW)
+      .attr('height', rectH)
+      .attr('fill', '#000');
+
+  // store sizes on data for link endpoint calculations
+  d.rectW = rectW;
+  d.rectH = rectH;
+
+    // Reposition texts to be inside rect: center first two lines, left-align the rest
+    const startX = -rectW/2 + padX;
+    const startY = -rectH/2 + padY + (lineHeight - 4);
+    g.selectAll('text').attr('y', (t, i) => startY + i * lineHeight).attr('x', (t, i) => i <= 1 ? 0 : startX).attr('text-anchor', (t, i) => i <= 1 ? 'middle' : 'start');
+});
+
+simulation.on('tick', () => {
+  // Update link paths: straight or arc when bidirectional
+  link.attr('d', function(d) {
+    // helper: compute intersection offset from center toward (dx,dy) for rectangle w,h
+    function intersectRect(w, h, dx, dy) {
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      const nx = dx / dist, ny = dy / dist;
+      const halfW = w/2, halfH = h/2;
+      // avoid division by zero
+      const tx = Math.abs(nx) < 1e-6 ? Infinity : halfW / Math.abs(nx);
+      const ty = Math.abs(ny) < 1e-6 ? Infinity : halfH / Math.abs(ny);
+      const t = Math.min(tx, ty);
+      return { x: nx * t, y: ny * t };
+    }
+
+    const sx = d.source.x, sy = d.source.y;
+    const tx = d.target.x, ty = d.target.y;
+    const dx = tx - sx, dy = ty - sy;
+
+    // compute offsets so paths end at rectangle borders
+    const srcOffset = intersectRect(d.source.rectW || 40, d.source.rectH || 30, dx, dy);
+    const tgtOffset = intersectRect(d.target.rectW || 40, d.target.rectH || 30, -dx, -dy);
+
+    const sx2 = sx + srcOffset.x;
+    const sy2 = sy + srcOffset.y;
+    const tx2 = tx + tgtOffset.x;
+    const ty2 = ty + tgtOffset.y;
+
+    if (d.both) {
+      // draw an arc between adjusted points with curvature
+      const drx = Math.sqrt(dx*dx + dy*dy) * 1.2;
+      const dry = drx;
+      const sweep = d.source.id < d.target.id ? 0 : 1;
+      return 'M' + sx2 + ',' + sy2 + 'A' + drx + ',' + dry + ' 0 0,' + sweep + ' ' + tx2 + ',' + ty2;
+    } else {
+      return 'M' + sx2 + ',' + sy2 + 'L' + tx2 + ',' + ty2;
+    }
+  })
+  .attr('stroke', '#5a5a5a');
+
+  // Update node positions
+  node.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// drag handlers
+function dragstarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x; d.fy = d.y;
+}
+function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+function dragended(event, d) { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
+
+// zoom
+svg.call(d3.zoom().scaleExtent([0.2, 4]).on('zoom', (event) => { container.attr('transform', event.transform); }));
+
+window.addEventListener('resize', () => {
+  const w = parentDiv.node().clientWidth;
+  const h = parentDiv.node().clientHeight;
+  svg.attr('viewBox', '0 0 ' + w + ' ' + h);
+  simulation.force('x', d3.forceX(w / 2).strength(0.01));
+  simulation.force('y', d3.forceY(h / 2).strength(0.01));
+  simulation.alpha(0.5).restart();
+});
+
