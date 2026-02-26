@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from api.model.Graph import Graph
+from ..model.Graph import Graph
 
 class VisualizerPlugin(ABC):
     """

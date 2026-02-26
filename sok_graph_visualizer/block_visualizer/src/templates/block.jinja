@@ -1,0 +1,189 @@
+// Script fragment for undirected block visualization
+// Assumes a div with id="main" exists and D3 is already loaded
+
+// Prepare data from server-side Jinja structures
+var nodes = [
+	{% for key, value in graph_nodes.items() %}
+		{
+			id: "{{ key }}",
+			name: "{{ value.attributes.get('name', value.node_id) }}",
+			attr: {{ value.attributes | tojson }}
+		},
+	{% endfor %}
+];
+
+var links = [
+	{% for key, value in graph_edges.items() %}
+		{% if value.source != value.target %}
+		{ source: "{{ value.source }}", target: "{{ value.target }}" },
+		{% endif %}
+	{% endfor %}
+];
+
+var selfLoops = [
+	{% for key, value in graph_edges.items() %}
+		{% if value.source == value.target %}
+		{ source: "{{ value.source }}", target: "{{ value.target }}" },
+		{% endif %}
+	{% endfor %}
+];
+
+const parentDiv = d3.select('#main');
+const width = parentDiv.node().clientWidth;
+const height = parentDiv.node().clientHeight;
+
+const svg = parentDiv.append('svg')
+	.attr('width', '100%')
+	.attr('height', '100%')
+	.attr('viewBox', `0 0 ${width} ${height}`)
+	.style('cursor', 'grab');
+
+// Container group to apply zoom/pan transforms
+const container = svg.append('g');
+
+const simulation = d3.forceSimulation(nodes.concat(selfLoops))
+	.force('link', d3.forceLink(links).id(d => d.id).distance(300))
+	.force('x', d3.forceX(width / 2).strength(0.01))
+	.force('y', d3.forceY(height / 2).strength(0.01))
+	.force('collide', d3.forceCollide().radius(() => 80).iterations(1));
+
+const link = container.append('g')
+	.attr('stroke', '#5a5a5a')
+	.attr('stroke-opacity', 0.6)
+	.selectAll('line')
+	.data(links)
+	.enter().append('line')
+	.attr('stroke-width', 1);
+
+const selfLoop = container.append('g')
+	.attr('fill', 'none')
+	.attr('stroke', '#5a5a5a')
+	.attr('stroke-opacity', 0.6)
+	.selectAll('path')
+	.data(selfLoops)
+	.enter().append('path')
+	.attr('class', 'self-loop')
+	.attr('stroke-width', 1);
+
+// Create node groups, measure text, and size rects to fit content
+const lineHeight = 16;
+const padX = 12;
+const padY = 8;
+
+const node = container.append('g')
+	.selectAll('g')
+	.data(nodes)
+	.enter().append('g')
+	.attr('class', 'node')
+	.call(d3.drag()
+		.on('start', dragstarted)
+		.on('drag', dragged)
+		.on('end', dragended))
+	.on('click', function(event, d) {
+		svg.selectAll('rect').attr('fill', '#000');
+		d3.select(this).select('rect').attr('fill', 'red');
+		const documentObject = d3.select('body').node().ownerDocument;
+		const startEvent = new CustomEvent('node-clicked', { detail: d.id });
+		documentObject.dispatchEvent(startEvent);
+	});
+
+// For each node group append text lines, measure, then insert rect behind
+node.each(function(d) {
+	const g = d3.select(this);
+	const lines = [];
+
+	// First line: node id (centered)
+	lines.push(d.id);
+	// Second line: visual separator (centered)
+	lines.push('────────');
+	// Third line: display name
+	lines.push('name:' + d.name);
+	for (const [k, v] of Object.entries(d.attr || {})) {
+		lines.push(`${k}: ${v}`);
+	}
+
+	lines.forEach((txt, i) => {
+		g.append('text')
+			.text(txt)
+			.attr('fill', '#fff')
+			.attr('font-size', 12)
+			.attr('font-family', 'Arial, Helvetica, sans-serif')
+			.attr('x', 0)
+			.attr('y', i * lineHeight);
+	});
+
+	// Measure text block
+	const bbox = g.node().getBBox();
+	const rectW = bbox.width + padX * 2;
+	const rectH = bbox.height + padY * 2;
+
+	// Insert rect as first child so it is behind text; center rect at group origin
+	g.insert('rect', ':first-child')
+		.attr('class', 'node-rect')
+		.attr('x', -rectW/2)
+		.attr('y', -rectH/2)
+		.attr('width', rectW)
+		.attr('height', rectH)
+		.attr('fill', '#000');
+
+	// Reposition texts: center first two lines, left-align the rest
+	const startX = -rectW/2 + padX;
+	const startY = -rectH/2 + padY + (lineHeight - 4);
+	g.selectAll('text')
+		.attr('y', (t, i) => startY + i * lineHeight)
+		.attr('x', (t, i) => i <= 1 ? 0 : startX)
+		.attr('text-anchor', (t, i) => i <= 1 ? 'middle' : 'start');
+});
+
+simulation.on('tick', () => {
+	link
+		.attr('x1', d => d.source.x)
+		.attr('y1', d => d.source.y)
+		.attr('x2', d => d.target.x)
+		.attr('y2', d => d.target.y);
+
+	selfLoop.attr('d', function(d) {
+		const nodeObj = nodes.find(n => n.id === d.source || n.id === d.source.id || (d.source.id && d.source.id === n.id));
+		if (!nodeObj) return '';
+		const r = 30;
+		const x = nodeObj.x;
+		const y = nodeObj.y;
+		return `M ${x + r},${y} A ${r * 1.5},${r * 1.5} 0 1,0 ${x - r},${y}`;
+	});
+
+	node.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// Drag handlers (d3 v7 style)
+function dragstarted(event, d) {
+	if (!event.active) simulation.alphaTarget(0.3).restart();
+	d.fx = d.x;
+	d.fy = d.y;
+}
+
+function dragged(event, d) {
+	d.fx = event.x;
+	d.fy = event.y;
+}
+
+function dragended(event, d) {
+	if (!event.active) simulation.alphaTarget(0);
+	d.fx = null;
+	d.fy = null;
+}
+
+// Zoom + pan
+svg.call(d3.zoom()
+	.scaleExtent([0.2, 4])
+	.on('zoom', (event) => { container.attr('transform', event.transform); }));
+
+// Window resize handling: update viewBox and simulation center
+window.addEventListener('resize', () => {
+	const w = parentDiv.node().clientWidth;
+	const h = parentDiv.node().clientHeight;
+	svg.attr('viewBox', `0 0 ${w} ${h}`);
+	simulation.force('x', d3.forceX(w / 2).strength(0.01));
+	simulation.force('y', d3.forceY(h / 2).strength(0.01));
+	simulation.alpha(0.5).restart();
+});
+
