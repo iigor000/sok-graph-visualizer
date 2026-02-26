@@ -1,5 +1,5 @@
-from api.model.abstract.Edge import Edge
-from api.model.abstract.Node import Node
+from api.model.Edge import Edge
+from api.model.Node import Node
 from typing import Dict, Optional, Set, List
 from copy import deepcopy
 
@@ -102,7 +102,7 @@ class Graph:
         self._adjacency_list[edge.source].add(edge.target)
         
         # For undirected graphs, add reverse connection
-        if not edge.directed:
+        if not self.directed:
             self._adjacency_list[edge.target].add(edge.source)
     
     def remove_edge(self, edge_id: str) -> None:
@@ -113,7 +113,7 @@ class Graph:
         edge = self.edges[edge_id]
         self._adjacency_list[edge.source].discard(edge.target)
         
-        if not edge.directed:
+        if not self.directed:
             self._adjacency_list[edge.target].discard(edge.source)
         
         del self.edges[edge_id]
