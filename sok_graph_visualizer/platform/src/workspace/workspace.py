@@ -8,6 +8,8 @@ from datetime import datetime
 
 from .operation import Operation
 
+from sok_graph_visualizer.api.model.Graph import Graph
+
 
 class Workspace:
     """
@@ -34,7 +36,7 @@ class Workspace:
     def __init__(
         self,
         workspace_id: str,
-        base_graph,
+        base_graph : Graph,
         name: str = "",
         metadata: Optional[Dict[str, Any]] = None
     ):
