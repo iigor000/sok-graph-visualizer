@@ -1,8 +1,8 @@
 
-from sok_graph_visualizer.platform.src.workspace.workspace_manager import WorkspaceManager
+from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
-from sok_graph_visualizer.platform.src.render.render_service import RenderService
+from sok_graph_visualizer.core.src.use_cases.render_service import RenderService
 
 
 class App():
