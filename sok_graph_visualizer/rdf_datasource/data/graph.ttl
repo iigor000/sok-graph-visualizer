@@ -1,0 +1,2121 @@
+@prefix ex: <http://example.org/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:person109 a ex:Person ;
+    ex:age 74 ;
+    ex:gender "Male" ;
+    ex:knows ex:person165,
+        ex:person177,
+        ex:person179,
+        ex:person193,
+        ex:person80 ;
+    foaf:name "Person 109" .
+
+ex:person122 a ex:Person ;
+    ex:age 18 ;
+    ex:gender "Male" ;
+    ex:knows ex:person18,
+        ex:person37,
+        ex:person63,
+        ex:person94 ;
+    foaf:name "Person 122" .
+
+ex:person128 a ex:Person ;
+    ex:age 61 ;
+    ex:gender "Female" ;
+    ex:knows ex:person107,
+        ex:person11,
+        ex:person127,
+        ex:person205,
+        ex:person51 ;
+    foaf:name "Person 128" .
+
+ex:person162 a ex:Person ;
+    ex:age 70 ;
+    ex:gender "Male" ;
+    ex:knows ex:person193,
+        ex:person228,
+        ex:person55,
+        ex:person71 ;
+    foaf:name "Person 162" .
+
+ex:person174 a ex:Person ;
+    ex:age 64 ;
+    ex:gender "Female" ;
+    ex:knows ex:person13,
+        ex:person164,
+        ex:person182,
+        ex:person231,
+        ex:person95 ;
+    foaf:name "Person 174" .
+
+ex:person218 a ex:Person ;
+    ex:age 49 ;
+    ex:gender "Male" ;
+    ex:knows ex:person18,
+        ex:person182,
+        ex:person72 ;
+    foaf:name "Person 218" .
+
+ex:person241 a ex:Person ;
+    ex:age 79 ;
+    ex:gender "Female" ;
+    ex:knows ex:person136,
+        ex:person142,
+        ex:person188,
+        ex:person96 ;
+    foaf:name "Person 241" .
+
+ex:person7 a ex:Person ;
+    ex:age 76 ;
+    ex:gender "Male" ;
+    ex:knows ex:person159,
+        ex:person181,
+        ex:person216,
+        ex:person242,
+        ex:person31 ;
+    foaf:name "Person 7" .
+
+ex:person9 a ex:Person ;
+    ex:age 80 ;
+    ex:gender "Male" ;
+    ex:knows ex:person153,
+        ex:person222,
+        ex:person59 ;
+    foaf:name "Person 9" .
+
+ex:person105 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Male" ;
+    ex:knows ex:person11,
+        ex:person146,
+        ex:person40 ;
+    foaf:name "Person 105" .
+
+ex:person113 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Female" ;
+    ex:knows ex:person143,
+        ex:person170,
+        ex:person202,
+        ex:person206,
+        ex:person96 ;
+    foaf:name "Person 113" .
+
+ex:person117 a ex:Person ;
+    ex:age 38 ;
+    ex:gender "Male" ;
+    ex:knows ex:person176,
+        ex:person179,
+        ex:person65 ;
+    foaf:name "Person 117" .
+
+ex:person126 a ex:Person ;
+    ex:age 42 ;
+    ex:gender "Male" ;
+    ex:knows ex:person114,
+        ex:person26,
+        ex:person8,
+        ex:person84,
+        ex:person90 ;
+    foaf:name "Person 126" .
+
+ex:person13 a ex:Person ;
+    ex:age 56 ;
+    ex:gender "Male" ;
+    ex:knows ex:person140,
+        ex:person183,
+        ex:person234 ;
+    foaf:name "Person 13" .
+
+ex:person139 a ex:Person ;
+    ex:age 73 ;
+    ex:gender "Male" ;
+    ex:knows ex:person14,
+        ex:person49 ;
+    foaf:name "Person 139" .
+
+ex:person150 a ex:Person ;
+    ex:age 51 ;
+    ex:gender "Male" ;
+    ex:knows ex:person110,
+        ex:person2,
+        ex:person20,
+        ex:person50,
+        ex:person53 ;
+    foaf:name "Person 150" .
+
+ex:person155 a ex:Person ;
+    ex:age 74 ;
+    ex:gender "Male" ;
+    ex:knows ex:person129,
+        ex:person209,
+        ex:person213,
+        ex:person235 ;
+    foaf:name "Person 155" .
+
+ex:person156 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Female" ;
+    ex:knows ex:person125,
+        ex:person214,
+        ex:person243,
+        ex:person67,
+        ex:person98 ;
+    foaf:name "Person 156" .
+
+ex:person159 a ex:Person ;
+    ex:age 57 ;
+    ex:gender "Female" ;
+    ex:knows ex:person206,
+        ex:person36,
+        ex:person49,
+        ex:person96 ;
+    foaf:name "Person 159" .
+
+ex:person168 a ex:Person ;
+    ex:age 74 ;
+    ex:gender "Female" ;
+    ex:knows ex:person136,
+        ex:person243,
+        ex:person97 ;
+    foaf:name "Person 168" .
+
+ex:person169 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Male" ;
+    ex:knows ex:person145,
+        ex:person249,
+        ex:person32,
+        ex:person66,
+        ex:person95 ;
+    foaf:name "Person 169" .
+
+ex:person171 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Female" ;
+    ex:knows ex:person194,
+        ex:person248,
+        ex:person55,
+        ex:person86 ;
+    foaf:name "Person 171" .
+
+ex:person196 a ex:Person ;
+    ex:age 71 ;
+    ex:gender "Female" ;
+    ex:knows ex:person33,
+        ex:person6,
+        ex:person60 ;
+    foaf:name "Person 196" .
+
+ex:person199 a ex:Person ;
+    ex:age 78 ;
+    ex:gender "Female" ;
+    ex:knows ex:person145,
+        ex:person148,
+        ex:person244,
+        ex:person4,
+        ex:person41 ;
+    foaf:name "Person 199" .
+
+ex:person200 a ex:Person ;
+    ex:age 20 ;
+    ex:gender "Male" ;
+    ex:knows ex:person110,
+        ex:person45,
+        ex:person56,
+        ex:person57 ;
+    foaf:name "Person 200" .
+
+ex:person207 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Female" ;
+    ex:knows ex:person134,
+        ex:person167 ;
+    foaf:name "Person 207" .
+
+ex:person22 a ex:Person ;
+    ex:age 36 ;
+    ex:gender "Male" ;
+    ex:knows ex:person23,
+        ex:person242,
+        ex:person62,
+        ex:person84 ;
+    foaf:name "Person 22" .
+
+ex:person227 a ex:Person ;
+    ex:age 77 ;
+    ex:gender "Female" ;
+    ex:knows ex:person16,
+        ex:person164,
+        ex:person170,
+        ex:person193,
+        ex:person51 ;
+    foaf:name "Person 227" .
+
+ex:person232 a ex:Person ;
+    ex:age 35 ;
+    ex:gender "Male" ;
+    ex:knows ex:person180,
+        ex:person42,
+        ex:person74 ;
+    foaf:name "Person 232" .
+
+ex:person246 a ex:Person ;
+    ex:age 45 ;
+    ex:gender "Female" ;
+    ex:knows ex:person133,
+        ex:person140,
+        ex:person187 ;
+    foaf:name "Person 246" .
+
+ex:person249 a ex:Person ;
+    ex:age 19 ;
+    ex:gender "Male" ;
+    ex:knows ex:person107,
+        ex:person134,
+        ex:person36,
+        ex:person82,
+        ex:person94 ;
+    foaf:name "Person 249" .
+
+ex:person50 a ex:Person ;
+    ex:age 36 ;
+    ex:gender "Male" ;
+    ex:knows ex:person121,
+        ex:person97 ;
+    foaf:name "Person 50" .
+
+ex:person76 a ex:Person ;
+    ex:age 23 ;
+    ex:gender "Female" ;
+    ex:knows ex:person210,
+        ex:person64 ;
+    foaf:name "Person 76" .
+
+ex:person77 a ex:Person ;
+    ex:age 71 ;
+    ex:gender "Male" ;
+    ex:knows ex:person100,
+        ex:person61,
+        ex:person63 ;
+    foaf:name "Person 77" .
+
+ex:person85 a ex:Person ;
+    ex:age 23 ;
+    ex:gender "Female" ;
+    ex:knows ex:person125,
+        ex:person63 ;
+    foaf:name "Person 85" .
+
+ex:person103 a ex:Person ;
+    ex:age 31 ;
+    ex:gender "Female" ;
+    ex:knows ex:person197,
+        ex:person74 ;
+    foaf:name "Person 103" .
+
+ex:person110 a ex:Person ;
+    ex:age 18 ;
+    ex:gender "Female" ;
+    ex:knows ex:person236,
+        ex:person46,
+        ex:person47 ;
+    foaf:name "Person 110" .
+
+ex:person115 a ex:Person ;
+    ex:age 64 ;
+    ex:gender "Male" ;
+    ex:knows ex:person100,
+        ex:person30,
+        ex:person73 ;
+    foaf:name "Person 115" .
+
+ex:person12 a ex:Person ;
+    ex:age 70 ;
+    ex:gender "Male" ;
+    ex:knows ex:person17,
+        ex:person26 ;
+    foaf:name "Person 12" .
+
+ex:person120 a ex:Person ;
+    ex:age 40 ;
+    ex:gender "Female" ;
+    ex:knows ex:person245,
+        ex:person88 ;
+    foaf:name "Person 120" .
+
+ex:person127 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Male" ;
+    ex:knows ex:person164,
+        ex:person169 ;
+    foaf:name "Person 127" .
+
+ex:person132 a ex:Person ;
+    ex:age 49 ;
+    ex:gender "Male" ;
+    ex:knows ex:person120,
+        ex:person222 ;
+    foaf:name "Person 132" .
+
+ex:person135 a ex:Person ;
+    ex:age 33 ;
+    ex:gender "Male" ;
+    ex:knows ex:person150,
+        ex:person172,
+        ex:person29,
+        ex:person62,
+        ex:person63 ;
+    foaf:name "Person 135" .
+
+ex:person137 a ex:Person ;
+    ex:age 31 ;
+    ex:gender "Female" ;
+    ex:knows ex:person17,
+        ex:person242,
+        ex:person34,
+        ex:person56,
+        ex:person98 ;
+    foaf:name "Person 137" .
+
+ex:person142 a ex:Person ;
+    ex:age 49 ;
+    ex:gender "Female" ;
+    ex:knows ex:person139,
+        ex:person60,
+        ex:person92 ;
+    foaf:name "Person 142" .
+
+ex:person15 a ex:Person ;
+    ex:age 75 ;
+    ex:gender "Female" ;
+    ex:knows ex:person12,
+        ex:person129,
+        ex:person208,
+        ex:person245,
+        ex:person27 ;
+    foaf:name "Person 15" .
+
+ex:person152 a ex:Person ;
+    ex:age 66 ;
+    ex:gender "Female" ;
+    ex:knows ex:person100,
+        ex:person144 ;
+    foaf:name "Person 152" .
+
+ex:person154 a ex:Person ;
+    ex:age 22 ;
+    ex:gender "Male" ;
+    ex:knows ex:person104,
+        ex:person147,
+        ex:person153,
+        ex:person163,
+        ex:person237 ;
+    foaf:name "Person 154" .
+
+ex:person158 a ex:Person ;
+    ex:age 67 ;
+    ex:gender "Male" ;
+    ex:knows ex:person11,
+        ex:person113,
+        ex:person193,
+        ex:person42,
+        ex:person91 ;
+    foaf:name "Person 158" .
+
+ex:person160 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Male" ;
+    ex:knows ex:person10,
+        ex:person172,
+        ex:person247,
+        ex:person28 ;
+    foaf:name "Person 160" .
+
+ex:person173 a ex:Person ;
+    ex:age 66 ;
+    ex:gender "Male" ;
+    ex:knows ex:person108,
+        ex:person19,
+        ex:person55,
+        ex:person56,
+        ex:person78 ;
+    foaf:name "Person 173" .
+
+ex:person178 a ex:Person ;
+    ex:age 58 ;
+    ex:gender "Male" ;
+    ex:knows ex:person123,
+        ex:person26,
+        ex:person34 ;
+    foaf:name "Person 178" .
+
+ex:person188 a ex:Person ;
+    ex:age 26 ;
+    ex:gender "Female" ;
+    ex:knows ex:person148,
+        ex:person202,
+        ex:person69 ;
+    foaf:name "Person 188" .
+
+ex:person190 a ex:Person ;
+    ex:age 64 ;
+    ex:gender "Female" ;
+    ex:knows ex:person116,
+        ex:person138,
+        ex:person244,
+        ex:person41,
+        ex:person59 ;
+    foaf:name "Person 190" .
+
+ex:person20 a ex:Person ;
+    ex:age 53 ;
+    ex:gender "Female" ;
+    ex:knows ex:person164,
+        ex:person211,
+        ex:person234 ;
+    foaf:name "Person 20" .
+
+ex:person201 a ex:Person ;
+    ex:age 33 ;
+    ex:gender "Male" ;
+    ex:knows ex:person10,
+        ex:person214 ;
+    foaf:name "Person 201" .
+
+ex:person202 a ex:Person ;
+    ex:age 18 ;
+    ex:gender "Male" ;
+    ex:knows ex:person140,
+        ex:person145,
+        ex:person175,
+        ex:person248,
+        ex:person83 ;
+    foaf:name "Person 202" .
+
+ex:person204 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Male" ;
+    ex:knows ex:person119,
+        ex:person219,
+        ex:person93 ;
+    foaf:name "Person 204" .
+
+ex:person205 a ex:Person ;
+    ex:age 80 ;
+    ex:gender "Female" ;
+    ex:knows ex:person124,
+        ex:person236,
+        ex:person31 ;
+    foaf:name "Person 205" .
+
+ex:person209 a ex:Person ;
+    ex:age 66 ;
+    ex:gender "Female" ;
+    ex:knows ex:person143,
+        ex:person165 ;
+    foaf:name "Person 209" .
+
+ex:person212 a ex:Person ;
+    ex:age 74 ;
+    ex:gender "Male" ;
+    ex:knows ex:person1,
+        ex:person149,
+        ex:person186,
+        ex:person226 ;
+    foaf:name "Person 212" .
+
+ex:person220 a ex:Person ;
+    ex:age 29 ;
+    ex:gender "Male" ;
+    ex:knows ex:person11,
+        ex:person167 ;
+    foaf:name "Person 220" .
+
+ex:person235 a ex:Person ;
+    ex:age 75 ;
+    ex:gender "Male" ;
+    ex:knows ex:person14,
+        ex:person181,
+        ex:person192 ;
+    foaf:name "Person 235" .
+
+ex:person236 a ex:Person ;
+    ex:age 69 ;
+    ex:gender "Male" ;
+    ex:knows ex:person138,
+        ex:person146,
+        ex:person188,
+        ex:person62 ;
+    foaf:name "Person 236" .
+
+ex:person239 a ex:Person ;
+    ex:age 29 ;
+    ex:gender "Female" ;
+    ex:knows ex:person119,
+        ex:person131,
+        ex:person211 ;
+    foaf:name "Person 239" .
+
+ex:person247 a ex:Person ;
+    ex:age 60 ;
+    ex:gender "Female" ;
+    ex:knows ex:person107,
+        ex:person183,
+        ex:person184,
+        ex:person82 ;
+    foaf:name "Person 247" .
+
+ex:person28 a ex:Person ;
+    ex:age 60 ;
+    ex:gender "Female" ;
+    ex:knows ex:person158,
+        ex:person207 ;
+    foaf:name "Person 28" .
+
+ex:person32 a ex:Person ;
+    ex:age 42 ;
+    ex:gender "Female" ;
+    ex:knows ex:person102,
+        ex:person239,
+        ex:person53,
+        ex:person90 ;
+    foaf:name "Person 32" .
+
+ex:person37 a ex:Person ;
+    ex:age 48 ;
+    ex:gender "Male" ;
+    ex:knows ex:person31,
+        ex:person52,
+        ex:person63 ;
+    foaf:name "Person 37" .
+
+ex:person38 a ex:Person ;
+    ex:age 41 ;
+    ex:gender "Female" ;
+    ex:knows ex:person133,
+        ex:person233 ;
+    foaf:name "Person 38" .
+
+ex:person5 a ex:Person ;
+    ex:age 32 ;
+    ex:gender "Male" ;
+    ex:knows ex:person134,
+        ex:person176 ;
+    foaf:name "Person 5" .
+
+ex:person58 a ex:Person ;
+    ex:age 64 ;
+    ex:gender "Male" ;
+    ex:knows ex:person215,
+        ex:person95 ;
+    foaf:name "Person 58" .
+
+ex:person61 a ex:Person ;
+    ex:age 71 ;
+    ex:gender "Male" ;
+    ex:knows ex:person170,
+        ex:person175,
+        ex:person179,
+        ex:person18,
+        ex:person60 ;
+    foaf:name "Person 61" .
+
+ex:person67 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Male" ;
+    ex:knows ex:person125,
+        ex:person134,
+        ex:person186 ;
+    foaf:name "Person 67" .
+
+ex:person69 a ex:Person ;
+    ex:age 21 ;
+    ex:gender "Female" ;
+    ex:knows ex:person108,
+        ex:person135,
+        ex:person204,
+        ex:person225,
+        ex:person44 ;
+    foaf:name "Person 69" .
+
+ex:person70 a ex:Person ;
+    ex:age 52 ;
+    ex:gender "Female" ;
+    ex:knows ex:person132,
+        ex:person47,
+        ex:person87 ;
+    foaf:name "Person 70" .
+
+ex:person71 a ex:Person ;
+    ex:age 68 ;
+    ex:gender "Male" ;
+    ex:knows ex:person219,
+        ex:person56 ;
+    foaf:name "Person 71" .
+
+ex:person73 a ex:Person ;
+    ex:age 71 ;
+    ex:gender "Female" ;
+    ex:knows ex:person125,
+        ex:person195 ;
+    foaf:name "Person 73" .
+
+ex:person78 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Female" ;
+    ex:knows ex:person148,
+        ex:person80 ;
+    foaf:name "Person 78" .
+
+ex:person79 a ex:Person ;
+    ex:age 75 ;
+    ex:gender "Male" ;
+    ex:knows ex:person146,
+        ex:person45 ;
+    foaf:name "Person 79" .
+
+ex:person80 a ex:Person ;
+    ex:age 48 ;
+    ex:gender "Female" ;
+    ex:knows ex:person1,
+        ex:person100,
+        ex:person121 ;
+    foaf:name "Person 80" .
+
+ex:person81 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Male" ;
+    ex:knows ex:person8,
+        ex:person96 ;
+    foaf:name "Person 81" .
+
+ex:person91 a ex:Person ;
+    ex:age 29 ;
+    ex:gender "Female" ;
+    ex:knows ex:person102,
+        ex:person105,
+        ex:person216,
+        ex:person72,
+        ex:person94 ;
+    foaf:name "Person 91" .
+
+ex:person106 a ex:Person ;
+    ex:age 75 ;
+    ex:gender "Male" ;
+    ex:knows ex:person134,
+        ex:person27 ;
+    foaf:name "Person 106" .
+
+ex:person112 a ex:Person ;
+    ex:age 46 ;
+    ex:gender "Male" ;
+    ex:knows ex:person197,
+        ex:person224,
+        ex:person44,
+        ex:person67 ;
+    foaf:name "Person 112" .
+
+ex:person121 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Male" ;
+    ex:knows ex:person108,
+        ex:person11,
+        ex:person119,
+        ex:person197,
+        ex:person57 ;
+    foaf:name "Person 121" .
+
+ex:person124 a ex:Person ;
+    ex:age 46 ;
+    ex:gender "Male" ;
+    ex:knows ex:person112,
+        ex:person221 ;
+    foaf:name "Person 124" .
+
+ex:person129 a ex:Person ;
+    ex:age 68 ;
+    ex:gender "Male" ;
+    ex:knows ex:person75,
+        ex:person89,
+        ex:person97 ;
+    foaf:name "Person 129" .
+
+ex:person130 a ex:Person ;
+    ex:age 42 ;
+    ex:gender "Male" ;
+    ex:knows ex:person39,
+        ex:person58 ;
+    foaf:name "Person 130" .
+
+ex:person131 a ex:Person ;
+    ex:age 21 ;
+    ex:gender "Female" ;
+    ex:knows ex:person147,
+        ex:person166,
+        ex:person211,
+        ex:person23 ;
+    foaf:name "Person 131" .
+
+ex:person138 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Female" ;
+    ex:knows ex:person118,
+        ex:person143,
+        ex:person179,
+        ex:person208,
+        ex:person237 ;
+    foaf:name "Person 138" .
+
+ex:person141 a ex:Person ;
+    ex:age 32 ;
+    ex:gender "Female" ;
+    ex:knows ex:person248,
+        ex:person35,
+        ex:person38 ;
+    foaf:name "Person 141" .
+
+ex:person149 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Female" ;
+    ex:knows ex:person15,
+        ex:person203 ;
+    foaf:name "Person 149" .
+
+ex:person165 a ex:Person ;
+    ex:age 31 ;
+    ex:gender "Female" ;
+    ex:knows ex:person156,
+        ex:person182,
+        ex:person31 ;
+    foaf:name "Person 165" .
+
+ex:person167 a ex:Person ;
+    ex:age 32 ;
+    ex:gender "Male" ;
+    ex:knows ex:person136,
+        ex:person189,
+        ex:person191,
+        ex:person85 ;
+    foaf:name "Person 167" .
+
+ex:person172 a ex:Person ;
+    ex:age 46 ;
+    ex:gender "Male" ;
+    ex:knows ex:person152,
+        ex:person201,
+        ex:person210,
+        ex:person26 ;
+    foaf:name "Person 172" .
+
+ex:person176 a ex:Person ;
+    ex:age 51 ;
+    ex:gender "Female" ;
+    ex:knows ex:person123,
+        ex:person220,
+        ex:person244,
+        ex:person74,
+        ex:person75 ;
+    foaf:name "Person 176" .
+
+ex:person185 a ex:Person ;
+    ex:age 60 ;
+    ex:gender "Female" ;
+    ex:knows ex:person170,
+        ex:person180,
+        ex:person87 ;
+    foaf:name "Person 185" .
+
+ex:person19 a ex:Person ;
+    ex:age 70 ;
+    ex:gender "Female" ;
+    ex:knows ex:person123,
+        ex:person134,
+        ex:person214,
+        ex:person8,
+        ex:person88 ;
+    foaf:name "Person 19" .
+
+ex:person191 a ex:Person ;
+    ex:age 50 ;
+    ex:gender "Male" ;
+    ex:knows ex:person213,
+        ex:person233,
+        ex:person41 ;
+    foaf:name "Person 191" .
+
+ex:person192 a ex:Person ;
+    ex:age 77 ;
+    ex:gender "Male" ;
+    ex:knows ex:person146,
+        ex:person161,
+        ex:person30,
+        ex:person37,
+        ex:person60 ;
+    foaf:name "Person 192" .
+
+ex:person198 a ex:Person ;
+    ex:age 36 ;
+    ex:gender "Female" ;
+    ex:knows ex:person0,
+        ex:person106,
+        ex:person130,
+        ex:person187 ;
+    foaf:name "Person 198" .
+
+ex:person21 a ex:Person ;
+    ex:age 72 ;
+    ex:gender "Female" ;
+    ex:knows ex:person149,
+        ex:person197,
+        ex:person2,
+        ex:person203,
+        ex:person23 ;
+    foaf:name "Person 21" .
+
+ex:person210 a ex:Person ;
+    ex:age 78 ;
+    ex:gender "Female" ;
+    ex:knows ex:person19,
+        ex:person57 ;
+    foaf:name "Person 210" .
+
+ex:person215 a ex:Person ;
+    ex:age 60 ;
+    ex:gender "Male" ;
+    ex:knows ex:person55,
+        ex:person84 ;
+    foaf:name "Person 215" .
+
+ex:person221 a ex:Person ;
+    ex:age 73 ;
+    ex:gender "Male" ;
+    ex:knows ex:person189,
+        ex:person190,
+        ex:person196,
+        ex:person25 ;
+    foaf:name "Person 221" .
+
+ex:person222 a ex:Person ;
+    ex:age 24 ;
+    ex:gender "Male" ;
+    ex:knows ex:person0,
+        ex:person130,
+        ex:person175,
+        ex:person193,
+        ex:person216 ;
+    foaf:name "Person 222" .
+
+ex:person223 a ex:Person ;
+    ex:age 44 ;
+    ex:gender "Female" ;
+    ex:knows ex:person205,
+        ex:person3,
+        ex:person33 ;
+    foaf:name "Person 223" .
+
+ex:person224 a ex:Person ;
+    ex:age 48 ;
+    ex:gender "Female" ;
+    ex:knows ex:person147,
+        ex:person209,
+        ex:person23 ;
+    foaf:name "Person 224" .
+
+ex:person229 a ex:Person ;
+    ex:age 20 ;
+    ex:gender "Female" ;
+    ex:knows ex:person187,
+        ex:person198,
+        ex:person217 ;
+    foaf:name "Person 229" .
+
+ex:person238 a ex:Person ;
+    ex:age 72 ;
+    ex:gender "Female" ;
+    ex:knows ex:person104,
+        ex:person177,
+        ex:person213,
+        ex:person226 ;
+    foaf:name "Person 238" .
+
+ex:person24 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Female" ;
+    ex:knows ex:person108,
+        ex:person4 ;
+    foaf:name "Person 24" .
+
+ex:person243 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Female" ;
+    ex:knows ex:person104,
+        ex:person233 ;
+    foaf:name "Person 243" .
+
+ex:person27 a ex:Person ;
+    ex:age 35 ;
+    ex:gender "Male" ;
+    ex:knows ex:person74,
+        ex:person97 ;
+    foaf:name "Person 27" .
+
+ex:person29 a ex:Person ;
+    ex:age 32 ;
+    ex:gender "Male" ;
+    ex:knows ex:person49,
+        ex:person79,
+        ex:person84 ;
+    foaf:name "Person 29" .
+
+ex:person34 a ex:Person ;
+    ex:age 23 ;
+    ex:gender "Male" ;
+    ex:knows ex:person234,
+        ex:person24 ;
+    foaf:name "Person 34" .
+
+ex:person35 a ex:Person ;
+    ex:age 22 ;
+    ex:gender "Female" ;
+    ex:knows ex:person157,
+        ex:person164,
+        ex:person208,
+        ex:person24 ;
+    foaf:name "Person 35" .
+
+ex:person39 a ex:Person ;
+    ex:age 23 ;
+    ex:gender "Male" ;
+    ex:knows ex:person115,
+        ex:person116,
+        ex:person134,
+        ex:person33,
+        ex:person90 ;
+    foaf:name "Person 39" .
+
+ex:person42 a ex:Person ;
+    ex:age 55 ;
+    ex:gender "Female" ;
+    ex:knows ex:person114,
+        ex:person18 ;
+    foaf:name "Person 42" .
+
+ex:person43 a ex:Person ;
+    ex:age 27 ;
+    ex:gender "Male" ;
+    ex:knows ex:person180,
+        ex:person195,
+        ex:person64 ;
+    foaf:name "Person 43" .
+
+ex:person47 a ex:Person ;
+    ex:age 48 ;
+    ex:gender "Female" ;
+    ex:knows ex:person121,
+        ex:person125,
+        ex:person6 ;
+    foaf:name "Person 47" .
+
+ex:person51 a ex:Person ;
+    ex:age 78 ;
+    ex:gender "Female" ;
+    ex:knows ex:person134,
+        ex:person181,
+        ex:person224,
+        ex:person39 ;
+    foaf:name "Person 51" .
+
+ex:person54 a ex:Person ;
+    ex:age 71 ;
+    ex:gender "Male" ;
+    ex:knows ex:person1,
+        ex:person151,
+        ex:person198,
+        ex:person30,
+        ex:person79 ;
+    foaf:name "Person 54" .
+
+ex:person6 a ex:Person ;
+    ex:age 31 ;
+    ex:gender "Female" ;
+    ex:knows ex:person195,
+        ex:person212,
+        ex:person82 ;
+    foaf:name "Person 6" .
+
+ex:person66 a ex:Person ;
+    ex:age 54 ;
+    ex:gender "Female" ;
+    ex:knows ex:person18,
+        ex:person182,
+        ex:person21,
+        ex:person232,
+        ex:person99 ;
+    foaf:name "Person 66" .
+
+ex:person68 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Female" ;
+    ex:knows ex:person10,
+        ex:person16,
+        ex:person214,
+        ex:person230 ;
+    foaf:name "Person 68" .
+
+ex:person72 a ex:Person ;
+    ex:age 33 ;
+    ex:gender "Male" ;
+    ex:knows ex:person141,
+        ex:person170,
+        ex:person224,
+        ex:person230 ;
+    foaf:name "Person 72" .
+
+ex:person75 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Female" ;
+    ex:knows ex:person197,
+        ex:person53 ;
+    foaf:name "Person 75" .
+
+ex:person89 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Female" ;
+    ex:knows ex:person111,
+        ex:person14 ;
+    foaf:name "Person 89" .
+
+ex:person92 a ex:Person ;
+    ex:age 39 ;
+    ex:gender "Female" ;
+    ex:knows ex:person1,
+        ex:person111,
+        ex:person118,
+        ex:person124,
+        ex:person184 ;
+    foaf:name "Person 92" .
+
+ex:person95 a ex:Person ;
+    ex:age 51 ;
+    ex:gender "Female" ;
+    ex:knows ex:person104,
+        ex:person145,
+        ex:person183,
+        ex:person191,
+        ex:person29 ;
+    foaf:name "Person 95" .
+
+ex:person99 a ex:Person ;
+    ex:age 42 ;
+    ex:gender "Male" ;
+    ex:knows ex:person0,
+        ex:person145,
+        ex:person161 ;
+    foaf:name "Person 99" .
+
+ex:person100 a ex:Person ;
+    ex:age 64 ;
+    ex:gender "Male" ;
+    ex:knows ex:person166,
+        ex:person180,
+        ex:person48,
+        ex:person52,
+        ex:person93 ;
+    foaf:name "Person 100" .
+
+ex:person101 a ex:Person ;
+    ex:age 24 ;
+    ex:gender "Male" ;
+    ex:knows ex:person21,
+        ex:person223,
+        ex:person99 ;
+    foaf:name "Person 101" .
+
+ex:person111 a ex:Person ;
+    ex:age 19 ;
+    ex:gender "Male" ;
+    ex:knows ex:person120,
+        ex:person214,
+        ex:person56 ;
+    foaf:name "Person 111" .
+
+ex:person116 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Female" ;
+    ex:knows ex:person141,
+        ex:person210,
+        ex:person229,
+        ex:person8 ;
+    foaf:name "Person 116" .
+
+ex:person118 a ex:Person ;
+    ex:age 23 ;
+    ex:gender "Female" ;
+    ex:knows ex:person82,
+        ex:person97 ;
+    foaf:name "Person 118" .
+
+ex:person119 a ex:Person ;
+    ex:age 67 ;
+    ex:gender "Female" ;
+    ex:knows ex:person36,
+        ex:person65 ;
+    foaf:name "Person 119" .
+
+ex:person123 a ex:Person ;
+    ex:age 20 ;
+    ex:gender "Male" ;
+    ex:knows ex:person0,
+        ex:person30 ;
+    foaf:name "Person 123" .
+
+ex:person133 a ex:Person ;
+    ex:age 47 ;
+    ex:gender "Female" ;
+    ex:knows ex:person183,
+        ex:person248 ;
+    foaf:name "Person 133" .
+
+ex:person136 a ex:Person ;
+    ex:age 22 ;
+    ex:gender "Female" ;
+    ex:knows ex:person23,
+        ex:person48 ;
+    foaf:name "Person 136" .
+
+ex:person14 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Female" ;
+    ex:knows ex:person167,
+        ex:person171,
+        ex:person20,
+        ex:person206,
+        ex:person62 ;
+    foaf:name "Person 14" .
+
+ex:person140 a ex:Person ;
+    ex:age 62 ;
+    ex:gender "Female" ;
+    ex:knows ex:person206,
+        ex:person4,
+        ex:person41,
+        ex:person96 ;
+    foaf:name "Person 140" .
+
+ex:person143 a ex:Person ;
+    ex:age 59 ;
+    ex:gender "Female" ;
+    ex:knows ex:person246,
+        ex:person88,
+        ex:person98 ;
+    foaf:name "Person 143" .
+
+ex:person144 a ex:Person ;
+    ex:age 78 ;
+    ex:gender "Female" ;
+    ex:knows ex:person112,
+        ex:person146,
+        ex:person151,
+        ex:person53 ;
+    foaf:name "Person 144" .
+
+ex:person151 a ex:Person ;
+    ex:age 24 ;
+    ex:gender "Female" ;
+    ex:knows ex:person136,
+        ex:person226,
+        ex:person237,
+        ex:person54 ;
+    foaf:name "Person 151" .
+
+ex:person153 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Female" ;
+    ex:knows ex:person194,
+        ex:person233,
+        ex:person44,
+        ex:person6,
+        ex:person61 ;
+    foaf:name "Person 153" .
+
+ex:person16 a ex:Person ;
+    ex:age 39 ;
+    ex:gender "Female" ;
+    ex:knows ex:person242,
+        ex:person98 ;
+    foaf:name "Person 16" .
+
+ex:person166 a ex:Person ;
+    ex:age 44 ;
+    ex:gender "Female" ;
+    ex:knows ex:person151,
+        ex:person180,
+        ex:person189,
+        ex:person46 ;
+    foaf:name "Person 166" .
+
+ex:person175 a ex:Person ;
+    ex:age 59 ;
+    ex:gender "Female" ;
+    ex:knows ex:person118,
+        ex:person133,
+        ex:person178,
+        ex:person185,
+        ex:person42 ;
+    foaf:name "Person 175" .
+
+ex:person177 a ex:Person ;
+    ex:age 53 ;
+    ex:gender "Male" ;
+    ex:knows ex:person0,
+        ex:person216,
+        ex:person76,
+        ex:person87 ;
+    foaf:name "Person 177" .
+
+ex:person181 a ex:Person ;
+    ex:age 25 ;
+    ex:gender "Male" ;
+    ex:knows ex:person141,
+        ex:person211,
+        ex:person223,
+        ex:person230 ;
+    foaf:name "Person 181" .
+
+ex:person184 a ex:Person ;
+    ex:age 46 ;
+    ex:gender "Male" ;
+    ex:knows ex:person107,
+        ex:person172,
+        ex:person44 ;
+    foaf:name "Person 184" .
+
+ex:person187 a ex:Person ;
+    ex:age 45 ;
+    ex:gender "Female" ;
+    ex:knows ex:person101,
+        ex:person163,
+        ex:person57 ;
+    foaf:name "Person 187" .
+
+ex:person189 a ex:Person ;
+    ex:age 59 ;
+    ex:gender "Male" ;
+    ex:knows ex:person114,
+        ex:person219 ;
+    foaf:name "Person 189" .
+
+ex:person194 a ex:Person ;
+    ex:age 18 ;
+    ex:gender "Female" ;
+    ex:knows ex:person179,
+        ex:person186 ;
+    foaf:name "Person 194" .
+
+ex:person203 a ex:Person ;
+    ex:age 51 ;
+    ex:gender "Female" ;
+    ex:knows ex:person102,
+        ex:person107 ;
+    foaf:name "Person 203" .
+
+ex:person208 a ex:Person ;
+    ex:age 38 ;
+    ex:gender "Female" ;
+    ex:knows ex:person163,
+        ex:person203,
+        ex:person227,
+        ex:person247 ;
+    foaf:name "Person 208" .
+
+ex:person213 a ex:Person ;
+    ex:age 36 ;
+    ex:gender "Male" ;
+    ex:knows ex:person22,
+        ex:person24 ;
+    foaf:name "Person 213" .
+
+ex:person217 a ex:Person ;
+    ex:age 30 ;
+    ex:gender "Female" ;
+    ex:knows ex:person111,
+        ex:person147,
+        ex:person5 ;
+    foaf:name "Person 217" .
+
+ex:person219 a ex:Person ;
+    ex:age 55 ;
+    ex:gender "Male" ;
+    ex:knows ex:person222,
+        ex:person240,
+        ex:person26,
+        ex:person3 ;
+    foaf:name "Person 219" .
+
+ex:person225 a ex:Person ;
+    ex:age 39 ;
+    ex:gender "Female" ;
+    ex:knows ex:person148,
+        ex:person31,
+        ex:person83,
+        ex:person96 ;
+    foaf:name "Person 225" .
+
+ex:person228 a ex:Person ;
+    ex:age 48 ;
+    ex:gender "Male" ;
+    ex:knows ex:person33,
+        ex:person52 ;
+    foaf:name "Person 228" .
+
+ex:person230 a ex:Person ;
+    ex:age 54 ;
+    ex:gender "Male" ;
+    ex:knows ex:person10,
+        ex:person124,
+        ex:person201,
+        ex:person215,
+        ex:person226 ;
+    foaf:name "Person 230" .
+
+ex:person231 a ex:Person ;
+    ex:age 52 ;
+    ex:gender "Male" ;
+    ex:knows ex:person0,
+        ex:person154,
+        ex:person199,
+        ex:person234,
+        ex:person86 ;
+    foaf:name "Person 231" .
+
+ex:person234 a ex:Person ;
+    ex:age 53 ;
+    ex:gender "Female" ;
+    ex:knows ex:person206,
+        ex:person240 ;
+    foaf:name "Person 234" .
+
+ex:person237 a ex:Person ;
+    ex:age 75 ;
+    ex:gender "Male" ;
+    ex:knows ex:person17,
+        ex:person240,
+        ex:person5,
+        ex:person51 ;
+    foaf:name "Person 237" .
+
+ex:person240 a ex:Person ;
+    ex:age 28 ;
+    ex:gender "Male" ;
+    ex:knows ex:person144,
+        ex:person208,
+        ex:person64,
+        ex:person68,
+        ex:person86 ;
+    foaf:name "Person 240" .
+
+ex:person244 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Female" ;
+    ex:knows ex:person155,
+        ex:person193,
+        ex:person30 ;
+    foaf:name "Person 244" .
+
+ex:person248 a ex:Person ;
+    ex:age 31 ;
+    ex:gender "Male" ;
+    ex:knows ex:person101,
+        ex:person123,
+        ex:person134,
+        ex:person197,
+        ex:person245 ;
+    foaf:name "Person 248" .
+
+ex:person25 a ex:Person ;
+    ex:age 60 ;
+    ex:gender "Male" ;
+    ex:knows ex:person1,
+        ex:person116,
+        ex:person186,
+        ex:person23 ;
+    foaf:name "Person 25" .
+
+ex:person3 a ex:Person ;
+    ex:age 56 ;
+    ex:gender "Female" ;
+    ex:knows ex:person178,
+        ex:person244,
+        ex:person43,
+        ex:person98 ;
+    foaf:name "Person 3" .
+
+ex:person36 a ex:Person ;
+    ex:age 74 ;
+    ex:gender "Female" ;
+    ex:knows ex:person132,
+        ex:person143,
+        ex:person75 ;
+    foaf:name "Person 36" .
+
+ex:person4 a ex:Person ;
+    ex:age 26 ;
+    ex:gender "Female" ;
+    ex:knows ex:person157,
+        ex:person240,
+        ex:person35,
+        ex:person69 ;
+    foaf:name "Person 4" .
+
+ex:person40 a ex:Person ;
+    ex:age 72 ;
+    ex:gender "Female" ;
+    ex:knows ex:person190,
+        ex:person221,
+        ex:person26,
+        ex:person3,
+        ex:person53 ;
+    foaf:name "Person 40" .
+
+ex:person41 a ex:Person ;
+    ex:age 68 ;
+    ex:gender "Female" ;
+    ex:knows ex:person157,
+        ex:person194 ;
+    foaf:name "Person 41" .
+
+ex:person45 a ex:Person ;
+    ex:age 42 ;
+    ex:gender "Female" ;
+    ex:knows ex:person106,
+        ex:person48 ;
+    foaf:name "Person 45" .
+
+ex:person46 a ex:Person ;
+    ex:age 31 ;
+    ex:gender "Female" ;
+    ex:knows ex:person142,
+        ex:person151,
+        ex:person16,
+        ex:person91 ;
+    foaf:name "Person 46" .
+
+ex:person49 a ex:Person ;
+    ex:age 64 ;
+    ex:gender "Male" ;
+    ex:knows ex:person1,
+        ex:person146,
+        ex:person229,
+        ex:person26,
+        ex:person27 ;
+    foaf:name "Person 49" .
+
+ex:person52 a ex:Person ;
+    ex:age 58 ;
+    ex:gender "Male" ;
+    ex:knows ex:person1,
+        ex:person214 ;
+    foaf:name "Person 52" .
+
+ex:person59 a ex:Person ;
+    ex:age 27 ;
+    ex:gender "Male" ;
+    ex:knows ex:person163,
+        ex:person66,
+        ex:person92 ;
+    foaf:name "Person 59" .
+
+ex:person64 a ex:Person ;
+    ex:age 79 ;
+    ex:gender "Male" ;
+    ex:knows ex:person163,
+        ex:person243 ;
+    foaf:name "Person 64" .
+
+ex:person8 a ex:Person ;
+    ex:age 72 ;
+    ex:gender "Male" ;
+    ex:knows ex:person102,
+        ex:person125,
+        ex:person157,
+        ex:person228,
+        ex:person229 ;
+    foaf:name "Person 8" .
+
+ex:person82 a ex:Person ;
+    ex:age 73 ;
+    ex:gender "Male" ;
+    ex:knows ex:person127,
+        ex:person135,
+        ex:person152 ;
+    foaf:name "Person 82" .
+
+ex:person83 a ex:Person ;
+    ex:age 35 ;
+    ex:gender "Male" ;
+    ex:knows ex:person12,
+        ex:person194,
+        ex:person242,
+        ex:person3,
+        ex:person71 ;
+    foaf:name "Person 83" .
+
+ex:person88 a ex:Person ;
+    ex:age 47 ;
+    ex:gender "Female" ;
+    ex:knows ex:person140,
+        ex:person166,
+        ex:person231,
+        ex:person47 ;
+    foaf:name "Person 88" .
+
+ex:person90 a ex:Person ;
+    ex:age 18 ;
+    ex:gender "Male" ;
+    ex:knows ex:person104,
+        ex:person206,
+        ex:person96 ;
+    foaf:name "Person 90" .
+
+ex:person102 a ex:Person ;
+    ex:age 22 ;
+    ex:gender "Male" ;
+    ex:knows ex:person182,
+        ex:person33 ;
+    foaf:name "Person 102" .
+
+ex:person104 a ex:Person ;
+    ex:age 26 ;
+    ex:gender "Male" ;
+    ex:knows ex:person175,
+        ex:person193,
+        ex:person195,
+        ex:person48,
+        ex:person86 ;
+    foaf:name "Person 104" .
+
+ex:person108 a ex:Person ;
+    ex:age 38 ;
+    ex:gender "Male" ;
+    ex:knows ex:person0,
+        ex:person19,
+        ex:person55 ;
+    foaf:name "Person 108" .
+
+ex:person11 a ex:Person ;
+    ex:age 64 ;
+    ex:gender "Female" ;
+    ex:knows ex:person108,
+        ex:person116,
+        ex:person125,
+        ex:person165 ;
+    foaf:name "Person 11" .
+
+ex:person114 a ex:Person ;
+    ex:age 74 ;
+    ex:gender "Male" ;
+    ex:knows ex:person176,
+        ex:person195,
+        ex:person43,
+        ex:person49,
+        ex:person57 ;
+    foaf:name "Person 114" .
+
+ex:person164 a ex:Person ;
+    ex:age 54 ;
+    ex:gender "Male" ;
+    ex:knows ex:person111,
+        ex:person129,
+        ex:person237,
+        ex:person59,
+        ex:person90 ;
+    foaf:name "Person 164" .
+
+ex:person183 a ex:Person ;
+    ex:age 52 ;
+    ex:gender "Male" ;
+    ex:knows ex:person0,
+        ex:person235 ;
+    foaf:name "Person 183" .
+
+ex:person186 a ex:Person ;
+    ex:age 59 ;
+    ex:gender "Male" ;
+    ex:knows ex:person147,
+        ex:person149,
+        ex:person185,
+        ex:person53 ;
+    foaf:name "Person 186" .
+
+ex:person195 a ex:Person ;
+    ex:age 40 ;
+    ex:gender "Female" ;
+    ex:knows ex:person114,
+        ex:person177,
+        ex:person217,
+        ex:person26,
+        ex:person48 ;
+    foaf:name "Person 195" .
+
+ex:person2 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Male" ;
+    ex:knows ex:person183,
+        ex:person43,
+        ex:person60 ;
+    foaf:name "Person 2" .
+
+ex:person211 a ex:Person ;
+    ex:age 20 ;
+    ex:gender "Female" ;
+    ex:knows ex:person10,
+        ex:person148,
+        ex:person68 ;
+    foaf:name "Person 211" .
+
+ex:person216 a ex:Person ;
+    ex:age 20 ;
+    ex:gender "Male" ;
+    ex:knows ex:person231,
+        ex:person46 ;
+    foaf:name "Person 216" .
+
+ex:person233 a ex:Person ;
+    ex:age 61 ;
+    ex:gender "Male" ;
+    ex:knows ex:person107,
+        ex:person223 ;
+    foaf:name "Person 233" .
+
+ex:person245 a ex:Person ;
+    ex:age 77 ;
+    ex:gender "Male" ;
+    ex:knows ex:person131,
+        ex:person163,
+        ex:person182,
+        ex:person40,
+        ex:person81 ;
+    foaf:name "Person 245" .
+
+ex:person30 a ex:Person ;
+    ex:age 62 ;
+    ex:gender "Female" ;
+    ex:knows ex:person137,
+        ex:person31,
+        ex:person52,
+        ex:person88 ;
+    foaf:name "Person 30" .
+
+ex:person55 a ex:Person ;
+    ex:age 60 ;
+    ex:gender "Male" ;
+    ex:knows ex:person147,
+        ex:person211,
+        ex:person219,
+        ex:person59,
+        ex:person87 ;
+    foaf:name "Person 55" .
+
+ex:person56 a ex:Person ;
+    ex:age 35 ;
+    ex:gender "Female" ;
+    ex:knows ex:person119,
+        ex:person153,
+        ex:person217 ;
+    foaf:name "Person 56" .
+
+ex:person57 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Male" ;
+    ex:knows ex:person161,
+        ex:person4,
+        ex:person54,
+        ex:person64,
+        ex:person70 ;
+    foaf:name "Person 57" .
+
+ex:person60 a ex:Person ;
+    ex:age 28 ;
+    ex:gender "Male" ;
+    ex:knows ex:person117,
+        ex:person185,
+        ex:person2,
+        ex:person231,
+        ex:person48 ;
+    foaf:name "Person 60" .
+
+ex:person62 a ex:Person ;
+    ex:age 55 ;
+    ex:gender "Male" ;
+    ex:knows ex:person101,
+        ex:person137,
+        ex:person17 ;
+    foaf:name "Person 62" .
+
+ex:person63 a ex:Person ;
+    ex:age 74 ;
+    ex:gender "Male" ;
+    ex:knows ex:person106,
+        ex:person44 ;
+    foaf:name "Person 63" .
+
+ex:person65 a ex:Person ;
+    ex:age 39 ;
+    ex:gender "Male" ;
+    ex:knows ex:person112,
+        ex:person44 ;
+    foaf:name "Person 65" .
+
+ex:person74 a ex:Person ;
+    ex:age 58 ;
+    ex:gender "Female" ;
+    ex:knows ex:person186,
+        ex:person45 ;
+    foaf:name "Person 74" .
+
+ex:person84 a ex:Person ;
+    ex:age 55 ;
+    ex:gender "Male" ;
+    ex:knows ex:person25,
+        ex:person65,
+        ex:person86 ;
+    foaf:name "Person 84" .
+
+ex:person93 a ex:Person ;
+    ex:age 52 ;
+    ex:gender "Male" ;
+    ex:knows ex:person179,
+        ex:person242 ;
+    foaf:name "Person 93" .
+
+ex:person94 a ex:Person ;
+    ex:age 43 ;
+    ex:gender "Male" ;
+    ex:knows ex:person168,
+        ex:person99 ;
+    foaf:name "Person 94" .
+
+ex:person98 a ex:Person ;
+    ex:age 54 ;
+    ex:gender "Female" ;
+    ex:knows ex:person144,
+        ex:person242,
+        ex:person32,
+        ex:person62,
+        ex:person73 ;
+    foaf:name "Person 98" .
+
+ex:person10 a ex:Person ;
+    ex:age 59 ;
+    ex:gender "Male" ;
+    ex:knows ex:person115,
+        ex:person157,
+        ex:person161 ;
+    foaf:name "Person 10" .
+
+ex:person145 a ex:Person ;
+    ex:age 76 ;
+    ex:gender "Male" ;
+    ex:knows ex:person103,
+        ex:person163,
+        ex:person173,
+        ex:person212,
+        ex:person40 ;
+    foaf:name "Person 145" .
+
+ex:person146 a ex:Person ;
+    ex:age 37 ;
+    ex:gender "Female" ;
+    ex:knows ex:person226,
+        ex:person238,
+        ex:person29,
+        ex:person93 ;
+    foaf:name "Person 146" .
+
+ex:person157 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Female" ;
+    ex:knows ex:person131,
+        ex:person221 ;
+    foaf:name "Person 157" .
+
+ex:person161 a ex:Person ;
+    ex:age 35 ;
+    ex:gender "Female" ;
+    ex:knows ex:person192,
+        ex:person70 ;
+    foaf:name "Person 161" .
+
+ex:person17 a ex:Person ;
+    ex:age 20 ;
+    ex:gender "Female" ;
+    ex:knows ex:person160,
+        ex:person217,
+        ex:person97 ;
+    foaf:name "Person 17" .
+
+ex:person170 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Male" ;
+    ex:knows ex:person145,
+        ex:person239,
+        ex:person28,
+        ex:person93 ;
+    foaf:name "Person 170" .
+
+ex:person179 a ex:Person ;
+    ex:age 67 ;
+    ex:gender "Male" ;
+    ex:knows ex:person148,
+        ex:person153 ;
+    foaf:name "Person 179" .
+
+ex:person18 a ex:Person ;
+    ex:age 36 ;
+    ex:gender "Male" ;
+    ex:knows ex:person161,
+        ex:person181,
+        ex:person242,
+        ex:person245 ;
+    foaf:name "Person 18" .
+
+ex:person180 a ex:Person ;
+    ex:age 40 ;
+    ex:gender "Female" ;
+    ex:knows ex:person147,
+        ex:person15,
+        ex:person54 ;
+    foaf:name "Person 180" .
+
+ex:person182 a ex:Person ;
+    ex:age 71 ;
+    ex:gender "Male" ;
+    ex:knows ex:person2,
+        ex:person213,
+        ex:person25,
+        ex:person53,
+        ex:person65 ;
+    foaf:name "Person 182" .
+
+ex:person197 a ex:Person ;
+    ex:age 19 ;
+    ex:gender "Female" ;
+    ex:knows ex:person17,
+        ex:person173,
+        ex:person206,
+        ex:person87 ;
+    foaf:name "Person 197" .
+
+ex:person23 a ex:Person ;
+    ex:age 67 ;
+    ex:gender "Female" ;
+    ex:knows ex:person114,
+        ex:person225,
+        ex:person238,
+        ex:person39,
+        ex:person77 ;
+    foaf:name "Person 23" .
+
+ex:person31 a ex:Person ;
+    ex:age 66 ;
+    ex:gender "Female" ;
+    ex:knows ex:person101,
+        ex:person118,
+        ex:person226 ;
+    foaf:name "Person 31" .
+
+ex:person33 a ex:Person ;
+    ex:age 41 ;
+    ex:gender "Female" ;
+    ex:knows ex:person17,
+        ex:person170,
+        ex:person25,
+        ex:person68,
+        ex:person83 ;
+    foaf:name "Person 33" .
+
+ex:person44 a ex:Person ;
+    ex:age 53 ;
+    ex:gender "Male" ;
+    ex:knows ex:person177,
+        ex:person78,
+        ex:person83 ;
+    foaf:name "Person 44" .
+
+ex:person48 a ex:Person ;
+    ex:age 47 ;
+    ex:gender "Male" ;
+    ex:knows ex:person160,
+        ex:person203,
+        ex:person225 ;
+    foaf:name "Person 48" .
+
+ex:person86 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Female" ;
+    ex:knows ex:person180,
+        ex:person192,
+        ex:person36,
+        ex:person45,
+        ex:person94 ;
+    foaf:name "Person 86" .
+
+ex:person97 a ex:Person ;
+    ex:age 29 ;
+    ex:gender "Female" ;
+    ex:knows ex:person216,
+        ex:person74 ;
+    foaf:name "Person 97" .
+
+ex:person107 a ex:Person ;
+    ex:age 38 ;
+    ex:gender "Female" ;
+    ex:knows ex:person238,
+        ex:person66 ;
+    foaf:name "Person 107" .
+
+ex:person148 a ex:Person ;
+    ex:age 68 ;
+    ex:gender "Male" ;
+    ex:knows ex:person166,
+        ex:person200,
+        ex:person225,
+        ex:person93 ;
+    foaf:name "Person 148" .
+
+ex:person163 a ex:Person ;
+    ex:age 59 ;
+    ex:gender "Male" ;
+    ex:knows ex:person1,
+        ex:person130,
+        ex:person214,
+        ex:person40,
+        ex:person65 ;
+    foaf:name "Person 163" .
+
+ex:person206 a ex:Person ;
+    ex:age 65 ;
+    ex:gender "Female" ;
+    ex:knows ex:person147,
+        ex:person198,
+        ex:person21,
+        ex:person228 ;
+    foaf:name "Person 206" .
+
+ex:person226 a ex:Person ;
+    ex:age 34 ;
+    ex:gender "Female" ;
+    ex:knows ex:person126,
+        ex:person144,
+        ex:person35,
+        ex:person87 ;
+    foaf:name "Person 226" .
+
+ex:person53 a ex:Person ;
+    ex:age 49 ;
+    ex:gender "Male" ;
+    ex:knows ex:person10,
+        ex:person148,
+        ex:person184 ;
+    foaf:name "Person 53" .
+
+ex:person87 a ex:Person ;
+    ex:age 47 ;
+    ex:gender "Female" ;
+    ex:knows ex:person215,
+        ex:person220,
+        ex:person33,
+        ex:person58 ;
+    foaf:name "Person 87" .
+
+ex:person96 a ex:Person ;
+    ex:age 75 ;
+    ex:gender "Female" ;
+    ex:knows ex:person157,
+        ex:person228,
+        ex:person245 ;
+    foaf:name "Person 96" .
+
+ex:person0 a ex:Person ;
+    ex:age 58 ;
+    ex:gender "Female" ;
+    ex:knows ex:person14,
+        ex:person161,
+        ex:person38,
+        ex:person84 ;
+    foaf:name "Person 0" .
+
+ex:person1 a ex:Person ;
+    ex:age 70 ;
+    ex:gender "Male" ;
+    ex:knows ex:person2,
+        ex:person46,
+        ex:person89 ;
+    foaf:name "Person 1" .
+
+ex:person125 a ex:Person ;
+    ex:age 33 ;
+    ex:gender "Male" ;
+    ex:knows ex:person158,
+        ex:person16,
+        ex:person187,
+        ex:person191,
+        ex:person233 ;
+    foaf:name "Person 125" .
+
+ex:person147 a ex:Person ;
+    ex:age 24 ;
+    ex:gender "Male" ;
+    ex:knows ex:person107,
+        ex:person138,
+        ex:person193,
+        ex:person214,
+        ex:person230 ;
+    foaf:name "Person 147" .
+
+ex:person193 a ex:Person ;
+    ex:age 78 ;
+    ex:gender "Female" ;
+    ex:knows ex:person103,
+        ex:person189,
+        ex:person34,
+        ex:person81 ;
+    foaf:name "Person 193" .
+
+ex:person214 a ex:Person ;
+    ex:age 49 ;
+    ex:gender "Male" ;
+    ex:knows ex:person125,
+        ex:person72,
+        ex:person87 ;
+    foaf:name "Person 214" .
+
+ex:person242 a ex:Person ;
+    ex:age 38 ;
+    ex:gender "Male" ;
+    ex:knows ex:person204,
+        ex:person86,
+        ex:person89,
+        ex:person94 ;
+    foaf:name "Person 242" .
+
+ex:person26 a ex:Person ;
+    ex:age 50 ;
+    ex:gender "Female" ;
+    ex:knows ex:person133,
+        ex:person184 ;
+    foaf:name "Person 26" .
+
+ex:person134 a ex:Person ;
+    ex:age 58 ;
+    ex:gender "Female" ;
+    ex:knows ex:person102,
+        ex:person154,
+        ex:person18,
+        ex:person226,
+        ex:person92 ;
+    foaf:name "Person 134" .
+

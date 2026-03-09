@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
+#from api.model.Graph import Graph
 from sok_graph_visualizer.api.model.Graph import Graph
 
 class DataSourcePlugin(ABC):
@@ -48,7 +49,7 @@ class DataSourcePlugin(ABC):
         pass
     
     @abstractmethod
-    def get_name(self) -> str:
+    def get_name(self) -> str:  
         """
         Get the human-readable name of this plugin.
         
