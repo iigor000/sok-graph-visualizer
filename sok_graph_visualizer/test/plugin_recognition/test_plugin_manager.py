@@ -17,7 +17,7 @@ if REPO_ROOT not in sys.path:
 
 from api.service.DataSourceService import DataSourcePlugin
 from api.service.DataVisualizerService import VisualizerPlugin
-from core.plugin_recognition import PluginManager
+from core.src.use_cases.plugin_recognition import PluginManager
 
 class ValidDataSourceMock(DataSourcePlugin):
     """

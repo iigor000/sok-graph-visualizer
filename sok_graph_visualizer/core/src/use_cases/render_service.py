@@ -1,8 +1,8 @@
 from typing import Any, Callable, Dict, List, Optional
 import inspect
 
-from sok_graph_visualizer.platform.src.workspace.workspace import Workspace
-from sok_graph_visualizer.platform.src.workspace.workspace_manager import WorkspaceManager
+from sok_graph_visualizer.core.src.workspace.workspace import Workspace
+from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.model.Graph import Graph
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 
