@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sok-graph-visualizer"
+version = "0.1.0"
+description = "SOK Graph Visualization Platform"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+dependencies = [
+    "Jinja2>=3.0",
+]
+
+[project.optional-dependencies]
+api = ["graph-api>=0.1.0"]
+core = ["graph-platform>=0.1.0"]
+visualizers = [
+    "graph-api>=0.1.0",
+    "Jinja2>=3.0",
+]
+django = [
+    "Django>=4.2",
+    "graph-platform>=0.1.0",
+]
+dev = [
+    "pytest>=7.0",
+    "black>=22.0",
+    "flake8>=4.0",
+]
+
+[tool.setuptools]
+packages = ["sok_graph_visualizer"]
+
+[tool.setuptools.package-dir]
+"" = "."
