@@ -1,0 +1,47 @@
+{
+  "graph_id": "ultimate_test_graph",
+  "directed": true,
+  "root": {
+    "@id": "CEO",
+    "name": "Alice Manager",
+    "salary": 5000.50,
+    "is_active": true,
+    "joined_date": "2023-01-15",
+    "tags": ["management", "founder", "tech"],
+    "departments": [
+      {
+        "@id": "HR_DEPT",
+        "name": "Human Resources",
+        "employees": [
+          {
+            "@id": "HR_1",
+            "name": "Bob HR",
+            "reports_to": "CEO"
+          }
+        ]
+      },
+      {
+        "@id": "TECH_DEPT",
+        "name": "Engineering",
+        "lead": "TECH_1",
+        "projects": [
+          {
+            "@id": "PROJ_X",
+            "status": "active",
+            "team": ["TECH_1", "HR_1"]
+          }
+        ]
+      }
+    ],
+    "mentors": {
+      "@id": "TECH_1",
+      "name": "Charlie Senior",
+      "expertise": "Python",
+      "works_with": "HR_1"
+    },
+    "metadata": {
+      "version": 1.0,
+      "internal_code": "ALPHA-99"
+    }
+  }
+}
