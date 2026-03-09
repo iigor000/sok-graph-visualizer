@@ -81,19 +81,23 @@ class JsonGraphParserService:
 
     def _build(self, obj, parent_id=None, relation=None):
         """
-        Recursively builds nodes and edges from a JSON object.
+        Recursively builds nodes and edges from a JSON object or a list of objects.
         - Nested dictionaries or lists are processed recursively.
         - References to "@id" create edges.
         - Literal values become node attributes.
         """
+        if isinstance(obj, list):
+            for item in obj:
+                self._build(item, parent_id, relation)
+            return
 
-        if not isinstance(obj, dict):
+        if not isinstance(obj, dict): 
             return
 
         node_id = obj.get("@id")
 
         if node_id is None:
-            node_id = "root" if parent_id is None else self._generate_node_id()
+            node_id = self._generate_node_id() if parent_id is not None else f"root_{next(self.node_counter)}"
 
         node_id = str(node_id)
 
