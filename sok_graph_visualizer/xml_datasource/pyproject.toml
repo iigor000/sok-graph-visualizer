@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graph-xml-datasource"
+version = "1.0.0"
+description = "XML data source plugin for Graph Visualization Platform"
+requires-python = ">=3.8"
+dependencies = [
+    "graph-api",
+    "lxml>=4.9.0",
+]
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.entry-points."graph.data_source"]
+xml_datasource = "xml_datasource.src.service:XmlDataSourceService"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]

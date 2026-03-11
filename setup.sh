@@ -60,6 +60,11 @@ echo "   ✓ graph-block-visualizer installed"
 echo "6. Installing RDF Datasource..."
 pip install -e "sok_graph_visualizer/rdf_datasource/" --quiet --upgrade
 echo "   ✓ graph-rdf-datasource installed"
+
+echo "7. Installing XML Datasource..."
+pip install -e "sok_graph_visualizer/xml_datasource/" --quiet --upgrade
+echo "   ✓ graph-xml-datasource installed"
+
 echo ""
 echo "=========================================="
 echo "✓ Setup complete!"
