@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}SOK Graph Visualizer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Left Panel: Workspaces -->
+    <div class="workspace-panel">
+        <h3>Workspaces</h3>
+        <div class="workspace-list">
+            {% if workspaces %}
+                {% for workspace in workspaces %}
+                <div class="workspace-item {% if workspace.active %}active{% endif %}" data-workspace-id="{{ workspace.id }}">
+                    {{ workspace.name }}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="workspace-item active">Workspace 1</div>
+                <div class="workspace-item">Workspace 2</div>
+                <div class="workspace-item">Workspace 3</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Middle Panel: Tree View and Bird View -->
+    <div class="middle-panel">
+        <!-- Tree View -->
+        <div class="tree-view">
+            <h3>Tree View</h3>
+            <div class="tree-view-content">
+                <p>Graph tree structure will appear here</p>
+            </div>
+        </div>
+
+        <!-- Bird View -->
+        <div class="bird-view">
+            <h3>Bird View</h3>
+            <div class="bird-view-content">
+                <p>Miniature graph overview will appear here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel: Main View and Filters -->
+    <div class="right-panel">
+        <!-- Main View -->
+        <div class="main-view">
+            <h3>Main View</h3>
+            <div class="main-view-content">
+                {% if graph_html %}
+                    {{ graph_html | safe }}
+                {% else %}
+                    <p>Main graph visualization will appear here</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-panel">
+            <h3>Filters</h3>
+            <div class="filters-content">
+                <p>Filter options will appear here</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

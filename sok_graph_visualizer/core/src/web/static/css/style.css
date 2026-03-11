@@ -1,0 +1,212 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --secondary-color: #6c757d;
+    --danger-color: #dc3545;
+    --dark-color: #333;
+    --light-color: #f9f9f9;
+    --text-color: #555;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --hover-bg: #e8e8e8;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    background-color: #f5f5f5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Main Container - Panel Layout */
+.container {
+    display: flex;
+    height: 100vh;
+    gap: 10px;
+    padding: 10px;
+    background-color: #f5f5f5;
+}
+
+/* Left panel - Workspaces */
+.workspace-panel {
+    width: 200px;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+}
+
+.workspace-panel h3 {
+    padding: 15px;
+    background-color: var(--light-color);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.workspace-list {
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.workspace-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-color);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.workspace-item:hover {
+    background-color: var(--hover-bg);
+    border-color: #d0d0d0;
+}
+
+.workspace-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-hover);
+}
+
+/* Middle panel - Tree view and Bird view */
+.middle-panel {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tree-view, .bird-view {
+    flex: 1;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+}
+
+.tree-view h3, .bird-view h3 {
+    padding: 12px;
+    background-color: var(--light-color);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.tree-view-content, .bird-view-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Right panel - Main view and Filters */
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.main-view, .filters-panel {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+}
+
+.main-view {
+    flex: 2;
+}
+
+.filters-panel {
+    flex: 1;
+}
+
+.main-view h3, .filters-panel h3 {
+    padding: 12px;
+    background-color: var(--light-color);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.main-view-content, .filters-content {
+    flex: 1;
+    overflow: auto;
+    padding: 15px;
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .workspace-panel,
+    .middle-panel {
+        width: 100%;
+        height: 150px;
+    }
+    
+    .middle-panel {
+        flex-direction: row;
+    }
+}
+
+@media (max-width: 768px) {
+    .middle-panel {
+        flex-direction: column;
+    }
+}
