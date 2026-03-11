@@ -2,7 +2,7 @@
 Test suite for PluginManager class.
 
 Run Instructions:
-    Navigate to the repository root and run python .\test\plugin_recognition\test_plugin_manager.py`    
+    Navigate to the repository root and run python -m pytest sok_graph_visualizer/test/plugin_recognition/ -v    
 """
 
 import unittest
@@ -15,9 +15,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from api.service.DataSourceService import DataSourcePlugin
-from api.service.DataVisualizerService import VisualizerPlugin
-from core.src.use_cases.plugin_recognition import PluginManager
+from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
+from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
+from sok_graph_visualizer.core.src.use_cases.plugin_recognition import PluginManager
 
 class ValidDataSourceMock(DataSourcePlugin):
     """
@@ -99,7 +99,7 @@ class TestPluginManager(unittest.TestCase):
         # we 'turn off' logger while testing
         logging.getLogger('core.plugin_recognition').setLevel(logging.CRITICAL)
 
-    @patch('core.plugin_recognition.entry_points')
+    @patch('sok_graph_visualizer.core.src.use_cases.plugin_recognition.entry_points')
     def test_load_valid_plugins(self, mock_entry_points):
         """
         Verify that the manager correctly loads and registers valid plugins.
@@ -145,7 +145,7 @@ class TestPluginManager(unittest.TestCase):
         self.assertIn("mock_simple_vis", dv_plugins)
         self.assertEqual(dv_plugins["mock_simple_vis"], ValidVisualizerMock)
 
-    @patch('core.plugin_recognition.entry_points')
+    @patch('sok_graph_visualizer.core.src.use_cases.plugin_recognition.entry_points')
     def test_invalid_plugin_is_rejected(self, mock_entry_points):
         """
         Verify that plugins failing validation are rejected and not registered.
@@ -171,7 +171,7 @@ class TestPluginManager(unittest.TestCase):
         self.assertEqual(len(self.manager.get_data_source_plugins()), 0)
         self.assertEqual(len(self.manager.get_visualizer_plugins()), 0)
 
-    @patch('core.plugin_recognition.entry_points')
+    @patch('sok_graph_visualizer.core.src.use_cases.plugin_recognition.entry_points')
     def test_duplicate_plugin_id_is_skipped(self, mock_entry_points):
         """
         Verify that duplicate plugin IDs are detected and only the first is kept.

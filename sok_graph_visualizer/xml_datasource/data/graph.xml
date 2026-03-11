@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sample XML dataset: City Transit Network
+  =========================================
+  CYCLIC graph – metro stations reference each other bidirectionally.
+  The ``reference`` attribute uses XPath to link back to already-defined
+  station nodes, creating cycles in the resulting graph.
+
+  Mapping:
+    <station>        → node
+    <line>           → node  (intermediate grouping)
+    <connection>     → edge via ``reference`` attribute (cyclic back-reference)
+    text leaf elems  → attributes on the parent node
+-->
+<transitNetwork city="Novi Sad" country="Serbia" established="1985-04-20" lines="6">
+
+  <line id="L1" name="1 Kec" color="#E63946" frequency_minutes="4">
+
+    <station id="S101" zone="1">
+      <name>Central Plaza</name>
+      <opened>1985-04-20</opened>
+      <platforms>4</platforms>
+      <daily_passengers>95000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="east" travel_time_min="3">
+          <station reference="//station[@id='S102']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S102" zone="1">
+      <name>University Gate</name>
+      <opened>1985-04-20</opened>
+      <platforms>2</platforms>
+      <daily_passengers>62000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="west" travel_time_min="3">
+          <station reference="//station[@id='S101']"/>
+        </connection>
+        <connection direction="east" travel_time_min="2">
+          <station reference="//station[@id='S103']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S103" zone="2">
+      <name>Riverside</name>
+      <opened>1987-11-01</opened>
+      <platforms>2</platforms>
+      <daily_passengers>48000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="west" travel_time_min="2">
+          <station reference="//station[@id='S102']"/>
+        </connection>
+        <connection direction="east" travel_time_min="4">
+          <station reference="//station[@id='S104']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S104" zone="2">
+      <name>Old Town</name>
+      <opened>1987-11-01</opened>
+      <platforms>2</platforms>
+      <daily_passengers>39000</daily_passengers>
+      <accessible>false</accessible>
+      <connections>
+        <connection direction="west" travel_time_min="4">
+          <station reference="//station[@id='S103']"/>
+        </connection>
+        <connection direction="east" travel_time_min="3">
+          <station reference="//station[@id='S105']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S105" zone="3">
+      <name>East Terminus</name>
+      <opened>1990-06-15</opened>
+      <platforms>2</platforms>
+      <daily_passengers>28000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="west" travel_time_min="3">
+          <station reference="//station[@id='S104']"/>
+        </connection>
+      </connections>
+    </station>
+
+  </line>
+
+  <line id="L2" name="2 Dvojka" color="#1D3557" frequency_minutes="5">
+
+    <station id="S201" zone="3">
+      <name>Airport</name>
+      <opened>1999-03-28</opened>
+      <platforms>2</platforms>
+      <daily_passengers>52000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="south" travel_time_min="6">
+          <station reference="//station[@id='S202']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S202" zone="2">
+      <name>North Gate</name>
+      <opened>1999-03-28</opened>
+      <platforms>2</platforms>
+      <daily_passengers>35000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="north" travel_time_min="6">
+          <station reference="//station[@id='S201']"/>
+        </connection>
+        <connection direction="south" travel_time_min="3">
+          <station reference="//station[@id='S203']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S203" zone="1">
+      <name>Central Plaza</name>
+      <note>Interchange with Red Line</note>
+      <opened>1999-03-28</opened>
+      <platforms>4</platforms>
+      <daily_passengers>95000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="north" travel_time_min="3">
+          <station reference="//station[@id='S202']"/>
+        </connection>
+        <connection direction="south" travel_time_min="4">
+          <station reference="//station[@id='S204']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="2">
+          <station reference="//station[@id='S101']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S204" zone="1">
+      <name>Stadium</name>
+      <opened>2003-09-10</opened>
+      <platforms>2</platforms>
+      <daily_passengers>44000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="north" travel_time_min="4">
+          <station reference="//station[@id='S203']"/>
+        </connection>
+        <connection direction="south" travel_time_min="5">
+          <station reference="//station[@id='S205']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S205" zone="2">
+      <name>Harbor</name>
+      <opened>2003-09-10</opened>
+      <platforms>2</platforms>
+      <daily_passengers>31000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="north" travel_time_min="5">
+          <station reference="//station[@id='S204']"/>
+        </connection>
+        <connection direction="south" travel_time_min="4">
+          <station reference="//station[@id='S206']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S206" zone="3">
+      <name>South Terminal</name>
+      <opened>2005-02-20</opened>
+      <platforms>2</platforms>
+      <daily_passengers>19000</daily_passengers>
+      <accessible>false</accessible>
+      <connections>
+        <connection direction="north" travel_time_min="4">
+          <station reference="//station[@id='S205']"/>
+        </connection>
+      </connections>
+    </station>
+
+  </line>
+
+  <line id="L3" name="3 Trojka" color="#2A9D8F" frequency_minutes="6">
+
+    <station id="S301" zone="1">
+      <name>Museum Quarter</name>
+      <opened>2008-05-12</opened>
+      <platforms>2</platforms>
+      <daily_passengers>41000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="3">
+          <station reference="//station[@id='S302']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="4">
+          <station reference="//station[@id='S306']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S302" zone="1">
+      <name>Tech Hub</name>
+      <opened>2008-05-12</opened>
+      <platforms>2</platforms>
+      <daily_passengers>56000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="2">
+          <station reference="//station[@id='S303']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="3">
+          <station reference="//station[@id='S301']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S303" zone="2">
+      <name>Market Street</name>
+      <opened>2008-05-12</opened>
+      <platforms>2</platforms>
+      <daily_passengers>37000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="3">
+          <station reference="//station[@id='S304']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="2">
+          <station reference="//station[@id='S302']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S304" zone="2">
+      <name>Botanical Gardens</name>
+      <opened>2010-09-22</opened>
+      <platforms>2</platforms>
+      <daily_passengers>27000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="4">
+          <station reference="//station[@id='S305']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="3">
+          <station reference="//station[@id='S303']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S305" zone="2">
+      <name>West Park</name>
+      <opened>2010-09-22</opened>
+      <platforms>2</platforms>
+      <daily_passengers>22000</daily_passengers>
+      <accessible>false</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="3">
+          <station reference="//station[@id='S306']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="4">
+          <station reference="//station[@id='S304']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S306" zone="1">
+      <name>Government Centre</name>
+      <opened>2010-09-22</opened>
+      <platforms>3</platforms>
+      <daily_passengers>48000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <!-- closes the circle -->
+        <connection direction="clockwise" travel_time_min="4">
+          <station reference="//station[@id='S301']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="3">
+          <station reference="//station[@id='S305']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="3">
+          <station reference="//station[@id='S205']"/>
+        </connection>
+      </connections>
+    </station>
+
+  </line>
+
+  <line id="L4" name="4 Cetvorka" color="#E9C46A" frequency_minutes="8">
+
+    <station id="S401" zone="3">
+      <name>Eastern Suburbs</name>
+      <opened>2015-07-04</opened>
+      <platforms>2</platforms>
+      <daily_passengers>18000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="inbound" travel_time_min="5">
+          <station reference="//station[@id='S402']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S402" zone="2">
+      <name>Business Park</name>
+      <opened>2015-07-04</opened>
+      <platforms>2</platforms>
+      <daily_passengers>34000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="outbound" travel_time_min="5">
+          <station reference="//station[@id='S401']"/>
+        </connection>
+        <connection direction="inbound" travel_time_min="4">
+          <station reference="//station[@id='S403']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S403" zone="1">
+      <name>Financial District</name>
+      <opened>2015-07-04</opened>
+      <platforms>3</platforms>
+      <daily_passengers>71000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="outbound" travel_time_min="4">
+          <station reference="//station[@id='S402']"/>
+        </connection>
+        <connection direction="inbound" travel_time_min="3">
+          <station reference="//station[@id='S404']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="2">
+          <station reference="//station[@id='S102']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S404" zone="1">
+      <name>Grand Junction</name>
+      <opened>2015-07-04</opened>
+      <platforms>4</platforms>
+      <daily_passengers>83000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="outbound" travel_time_min="3">
+          <station reference="//station[@id='S403']"/>
+        </connection>
+        <connection direction="inbound" travel_time_min="6">
+          <station reference="//station[@id='S405']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="2">
+          <station reference="//station[@id='S302']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S405" zone="2">
+      <name>Convention Centre</name>
+      <opened>2017-11-19</opened>
+      <platforms>2</platforms>
+      <daily_passengers>29000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="outbound" travel_time_min="6">
+          <station reference="//station[@id='S404']"/>
+        </connection>
+        <connection direction="inbound" travel_time_min="5">
+          <station reference="//station[@id='S406']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S406" zone="3">
+      <name>Western Terminus</name>
+      <opened>2017-11-19</opened>
+      <platforms>2</platforms>
+      <daily_passengers>14000</daily_passengers>
+      <accessible>false</accessible>
+      <connections>
+        <connection direction="outbound" travel_time_min="5">
+          <station reference="//station[@id='S405']"/>
+        </connection>
+      </connections>
+    </station>
+
+  </line>
+
+  <line id="L5" name="5 Petica" color="#6A0572" frequency_minutes="12">
+
+    <station id="S501" zone="2">
+      <name>Night Market</name>
+      <opened>2020-01-15</opened>
+      <platforms>2</platforms>
+      <daily_passengers>12000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="forward" travel_time_min="4">
+          <station reference="//station[@id='S502']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S502" zone="1">
+      <name>Entertainment District</name>
+      <opened>2020-01-15</opened>
+      <platforms>2</platforms>
+      <daily_passengers>26000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="backward" travel_time_min="4">
+          <station reference="//station[@id='S501']"/>
+        </connection>
+        <connection direction="forward" travel_time_min="3">
+          <station reference="//station[@id='S503']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S503" zone="1">
+      <name>Arts Quarter</name>
+      <opened>2020-01-15</opened>
+      <platforms>2</platforms>
+      <daily_passengers>19000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="backward" travel_time_min="3">
+          <station reference="//station[@id='S502']"/>
+        </connection>
+        <connection direction="forward" travel_time_min="5">
+          <station reference="//station[@id='S504']"/>
+        </connection>
+        <connection direction="loop" travel_time_min="8">
+          <station reference="//station[@id='S501']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S504" zone="2">
+      <name>Old Harbour</name>
+      <opened>2022-04-03</opened>
+      <platforms>2</platforms>
+      <daily_passengers>9000</daily_passengers>
+      <accessible>false</accessible>
+      <connections>
+        <connection direction="backward" travel_time_min="5">
+          <station reference="//station[@id='S503']"/>
+        </connection>
+      </connections>
+    </station>
+
+  </line>
+
+  <line id="L6" name="6 Sestica" color="#F4A261" frequency_minutes="7">
+
+    <station id="S601" zone="2">
+      <name>Northern Hub</name>
+      <opened>2018-06-10</opened>
+      <platforms>3</platforms>
+      <daily_passengers>38000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="4">
+          <station reference="//station[@id='S602']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="5">
+          <station reference="//station[@id='S606']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="2">
+          <station reference="//station[@id='S202']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S602" zone="2">
+      <name>Eastern Hub</name>
+      <opened>2018-06-10</opened>
+      <platforms>3</platforms>
+      <daily_passengers>44000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="3">
+          <station reference="//station[@id='S603']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="4">
+          <station reference="//station[@id='S601']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="2">
+          <station reference="//station[@id='S104']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S603" zone="2">
+      <name>South-East Hub</name>
+      <opened>2018-06-10</opened>
+      <platforms>2</platforms>
+      <daily_passengers>29000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="5">
+          <station reference="//station[@id='S604']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="3">
+          <station reference="//station[@id='S602']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S604" zone="2">
+      <name>Southern Hub</name>
+      <opened>2018-06-10</opened>
+      <platforms>3</platforms>
+      <daily_passengers>33000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="4">
+          <station reference="//station[@id='S605']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="5">
+          <station reference="//station[@id='S603']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="2">
+          <station reference="//station[@id='S206']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S605" zone="2">
+      <name>Western Hub</name>
+      <opened>2018-06-10</opened>
+      <platforms>2</platforms>
+      <daily_passengers>25000</daily_passengers>
+      <accessible>false</accessible>
+      <connections>
+        <connection direction="clockwise" travel_time_min="5">
+          <station reference="//station[@id='S606']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="4">
+          <station reference="//station[@id='S604']"/>
+        </connection>
+        <connection direction="interchange" travel_time_min="3">
+          <station reference="//station[@id='S406']"/>
+        </connection>
+      </connections>
+    </station>
+
+    <station id="S606" zone="2">
+      <name>North-West Hub</name>
+      <opened>2018-06-10</opened>
+      <platforms>2</platforms>
+      <daily_passengers>21000</daily_passengers>
+      <accessible>true</accessible>
+      <connections>
+        <!-- closes the orbital ring -->
+        <connection direction="clockwise" travel_time_min="4">
+          <station reference="//station[@id='S601']"/>
+        </connection>
+        <connection direction="counterclockwise" travel_time_min="5">
+          <station reference="//station[@id='S605']"/>
+        </connection>
+      </connections>
+    </station>
+
+  </line>
+
+</transitNetwork>

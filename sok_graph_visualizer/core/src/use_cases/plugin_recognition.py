@@ -1,7 +1,7 @@
 from importlib.metadata import entry_points
 import logging
-from api.service.DataVisualizerService import VisualizerPlugin
-from api.service.DataSourceService import DataSourcePlugin
+from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
+from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
 
 logger = logging.getLogger(__name__)
 
