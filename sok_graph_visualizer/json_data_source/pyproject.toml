@@ -3,19 +3,16 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "graph-rdf-datasource"
+name = "graph-json-datasource"
 version = "0.1.0"
-description = "RDF data source plugin for Graph Visualization Platform"
-readme = "README.md"
+description = "JSON data source plugin for Graph Visualization Platform"
 requires-python = ">=3.8"
-license = {text = "MIT"}
-
 dependencies = [
-    "graph-api>=0.1.0",
+    "graph-api",
 ]
 
 [project.entry-points."graph.data_source"]
-rdf_datasource = "rdf_datasource.src.implementation:RDFDataSourcePlugin"
+json_datasource = "json_data_source.src.implementation:JsonDataSourcePlugin"
 
 [tool.setuptools.packages.find]
 where = ["."]

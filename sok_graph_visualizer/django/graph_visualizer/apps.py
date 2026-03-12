@@ -45,3 +45,8 @@ class GraphExplorerConfig(AppConfig):
     def graph_query_service(self):
         """Return the GraphQueryService instance."""
         return self.core_app.graph_query_service
+
+    @property
+    def plugin_manager(self):
+        """Return the PluginManager instance."""
+        return self.core_app.plugin_manager

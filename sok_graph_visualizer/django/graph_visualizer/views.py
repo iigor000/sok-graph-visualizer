@@ -19,17 +19,8 @@ def index(request):
     """
     Main view with panel layout.
     """
-    active_workspace_id = request.session.get("active_workspace_id", 1)
-
-    workspaces = [
-        {"id": 1, "name": "Workspace 1", "active": active_workspace_id == 1},
-        {"id": 2, "name": "Workspace 2", "active": active_workspace_id == 2},
-        {"id": 3, "name": "Workspace 3", "active": active_workspace_id == 3},
-    ]
-
     context = {
         "title": "SOK Graph Visualizer",
-        "workspaces": workspaces,
     }
 
     return render(request, "index.html", context)
@@ -86,14 +77,8 @@ def list_workspaces(request):
     List all workspaces - API endpoint.
     """
     try:
-        active_workspace_id = request.session.get("active_workspace_id", 1)
-
-        workspaces = [
-            {"id": 1, "name": "Workspace 1", "active": active_workspace_id == 1},
-            {"id": 2, "name": "Workspace 2", "active": active_workspace_id == 2},
-            {"id": 3, "name": "Workspace 3", "active": active_workspace_id == 3},
-        ]
-
+        # Return empty list - workspaces will be created via user interaction
+        workspaces = []
         return JsonResponse(workspaces, safe=False)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
@@ -105,13 +90,12 @@ def get_workspace(request, workspace_id):
     Get workspace data by ID - API endpoint.
     """
     try:
-        active_workspace_id = request.session.get("active_workspace_id", 1)
-
+        # Return minimal workspace data
         return JsonResponse(
             {
                 "id": workspace_id,
                 "name": f"Workspace {workspace_id}",
-                "active": active_workspace_id == workspace_id,
+                "active": False,
                 "nodes": [],
                 "edges": [],
             }
@@ -136,3 +120,34 @@ def health(request):
             "services_loaded": services_loaded,
         }
     )
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def list_data_source_plugins(request):
+    """
+    List available data source plugins and their required config fields.
+    """
+    try:
+        config = _get_app_config()
+        plugin_manager = config.plugin_manager
+        
+        if not plugin_manager or not plugin_manager._data_sources:
+            return JsonResponse({'error': 'Data source plugins not available'}, status=500)
+
+        plugins = []
+        
+        for plugin_id, plugin_class in plugin_manager._data_sources.items():
+            plugin_instance = plugin_class(config={})
+            required_config = plugin_instance.get_required_config()
+            plugins.append({
+                'id': plugin_id,
+                'name': plugin_instance.get_name(),
+                'required_config': [
+                    {'key': key, 'description': description}
+                    for key, description in required_config.items()
+                ]
+            })
+        return JsonResponse({'plugins': plugins})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

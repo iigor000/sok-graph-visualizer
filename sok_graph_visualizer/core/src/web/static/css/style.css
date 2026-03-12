@@ -84,6 +84,205 @@ body {
     border-color: var(--primary-hover);
 }
 
+.workspace-item-create {
+    border: 1px dashed #aaa;
+    background-color: white;
+    color: #666;
+    text-align: center;
+}
+
+.workspace-item-create:hover {
+    background-color: #f5f5ff;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.workspace-page {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.workspace-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.workspace-page-header h2 {
+    color: var(--dark-color);
+    font-size: 22px;
+}
+
+.workspace-list-card {
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    padding: 12px;
+}
+
+.workspace-list-modern {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.workspace-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background-color: #f6f6f6;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.workspace-row:hover {
+    border-color: #d0d0d0;
+    background-color: var(--hover-bg);
+}
+
+.workspace-row.active {
+    background-color: #e6f0ff;
+    border-color: var(--primary-color);
+}
+
+.workspace-row-name {
+    color: var(--dark-color);
+    font-size: 14px;
+}
+
+.workspace-row-badge {
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.btn {
+    border: none;
+    border-radius: 4px;
+    padding: 9px 14px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.workspace-feedback,
+.workspace-alert {
+    margin-bottom: 14px;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+}
+
+.workspace-alert-error {
+    background-color: #fdebec;
+    color: #a7202a;
+    border: 1px solid #f5c2c7;
+}
+
+.workspace-alert-success {
+    background-color: #eaf9f0;
+    color: #1f6f3e;
+    border: 1px solid #b7ebc6;
+}
+
+.workspace-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.workspace-modal[hidden] {
+    display: none;
+}
+
+.workspace-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.workspace-modal-content {
+    position: relative;
+    width: min(560px, 92vw);
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.workspace-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.workspace-modal-close {
+    border: none;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--secondary-color);
+}
+
+.workspace-form {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field label {
+    font-size: 13px;
+    color: var(--dark-color);
+}
+
+.form-field input,
+.form-field select {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.workspace-modal-actions {
+    margin-top: 6px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 /* Middle panel - Tree view and Bird view */
 .middle-panel {
     width: 250px;

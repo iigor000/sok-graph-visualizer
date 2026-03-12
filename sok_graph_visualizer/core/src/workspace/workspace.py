@@ -1,5 +1,5 @@
 """
-Workspace class for managing graph state and operations.
+Workspace class for managing graph state, plugins, and operations.
 """
 
 from typing import Dict, Optional, Any, List
@@ -9,6 +9,8 @@ from datetime import datetime
 from .operation import Operation
 
 from sok_graph_visualizer.api.model.Graph import Graph
+from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
+from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 
 
 class Workspace:
@@ -18,15 +20,19 @@ class Workspace:
     A workspace encapsulates:
     - Base graph (the original, unmodified graph)
     - Current graph (the working graph with transformations applied)
+    - Active data source plugin
+    - Active visualizer plugin
     - Operation history (stack of operations for undo functionality)
     - Selected node information
-    - Metadata (plugin info, parameters, etc.)
+    - Metadata (parameters and other workspace state)
     
     Attributes:
         workspace_id (str): Unique identifier for the workspace
         name (str): Human-readable name for the workspace
         base_graph: The original graph
         current_graph: The current state of the graph
+        data_source_plugin (Optional[DataSourcePlugin]): Active data source plugin for the workspace
+        visualizer_plugin (Optional[VisualizerPlugin]): Active visualizer plugin for the workspace
         operation_history (List[Operation]): History of operations performed
         current_operation_index (int): Current position in operation history (for undo/redo)
         selected_node_id (Optional[str]): ID of currently selected node
@@ -38,6 +44,8 @@ class Workspace:
         workspace_id: str,
         base_graph : Graph,
         name: str = "",
+        data_source_plugin: Optional[DataSourcePlugin] = None,
+        visualizer_plugin: Optional[VisualizerPlugin] = None,
         metadata: Optional[Dict[str, Any]] = None
     ):
         """
@@ -47,12 +55,16 @@ class Workspace:
             workspace_id: Unique identifier for the workspace
             base_graph: The initial graph to work with
             name: Human-readable name (defaults to workspace_id)
+            data_source_plugin: Active data source plugin for this workspace
+            visualizer_plugin: Active visualizer plugin for this workspace
             metadata: Additional metadata dictionary
         """
         self.workspace_id = workspace_id
         self.name = name or workspace_id
         self.base_graph = deepcopy(base_graph)
         self.current_graph = deepcopy(base_graph)
+        self.data_source_plugin = data_source_plugin
+        self.visualizer_plugin = visualizer_plugin
         self.operation_history: List[Operation] = []
         self.current_operation_index = -1  # -1 means at base state
         self.selected_node_id: Optional[str] = None
@@ -64,7 +76,6 @@ class Workspace:
         self,
         new_graph,
         operation_type: str,
-        plugin_name: Optional[str] = None,
         parameters: Optional[Dict[str, Any]] = None,
         description: str = ""
     ) -> None:
@@ -79,7 +90,6 @@ class Workspace:
         Args:
             new_graph: The resulting graph after the operation
             operation_type: Type of operation performed
-            plugin_name: Name of the plugin that performed the operation
             parameters: Parameters used in the operation
             description: Human-readable description
         """
@@ -90,7 +100,6 @@ class Workspace:
         # Create and add new operation
         operation = Operation(
             operation_type=operation_type,
-            plugin_name=plugin_name,
             parameters=parameters,
             description=description
         )
@@ -196,6 +205,16 @@ class Workspace:
         if node_id is not None and node_id not in self.current_graph.nodes:
             raise ValueError(f"Node '{node_id}' does not exist in current graph")
         self.selected_node_id = node_id
+        self.modified_at = datetime.now()
+
+    def set_data_source_plugin(self, plugin: Optional[DataSourcePlugin]) -> None:
+        """Set the active data source plugin for this workspace."""
+        self.data_source_plugin = plugin
+        self.modified_at = datetime.now()
+
+    def set_visualizer_plugin(self, plugin: Optional[VisualizerPlugin]) -> None:
+        """Set the active visualizer plugin for this workspace."""
+        self.visualizer_plugin = plugin
         self.modified_at = datetime.now()
     
     def get_selected_node(self):

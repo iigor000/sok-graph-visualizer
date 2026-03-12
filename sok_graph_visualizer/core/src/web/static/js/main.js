@@ -19,6 +19,11 @@ function getCsrfToken() {
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('SOK Graph Visualizer initialized');
+
+    // Workspace management on index is handled by workspace.js
+    if (document.getElementById('open-create-workspace-modal')) {
+        return;
+    }
     
     // Workspace switching
     document.querySelectorAll('.workspace-item').forEach(item => {

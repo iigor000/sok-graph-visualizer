@@ -45,7 +45,8 @@ class RenderService:
         workspace: Workspace = self.workspace_manager.workspaces.get(self.workspace_manager.active_workspace_id)
         if workspace is None:
             raise RuntimeError("Active workspace not found")
-        if self.visualizer is None:
+        visualizer = workspace.visualizer_plugin or self.visualizer
+        if visualizer is None:
             raise RuntimeError("No visualizer plugin selected")
 
         graph: Graph = workspace.current_graph
@@ -54,7 +55,7 @@ class RenderService:
         self._emit("pre_render", graph=graph, workspace=workspace)
 
         # pass Graph model directly; visualizer is responsible for data-node-id in HTML
-        result = self.visualizer.render(graph)
+        result = visualizer.render(graph)
 
         # hook after render
         self._emit("post_render", graph=graph, workspace=workspace, result=result)

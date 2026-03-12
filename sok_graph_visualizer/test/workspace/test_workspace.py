@@ -7,14 +7,15 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-project_root = Path(__file__).parent.parent.parent
+project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / "platform" / "src"))
 
-from api.model.Graph import Graph
-from api.model.Node import Node
-from api.model.Edge import Edge
-from workspace import Workspace, WorkspaceManager, Operation
+from sok_graph_visualizer.api.model.Graph import Graph
+from sok_graph_visualizer.api.model.Node import Node
+from sok_graph_visualizer.api.model.Edge import Edge
+from sok_graph_visualizer.core.src.workspace.workspace import Workspace
+from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
+from sok_graph_visualizer.core.src.workspace.operation import Operation
 
 
 class TestOperation(unittest.TestCase):
@@ -24,26 +25,25 @@ class TestOperation(unittest.TestCase):
         """Test creating an operation."""
         op = Operation(
             operation_type="add_node",
-            plugin_name="TestPlugin",
             parameters={"node_id": "A"},
             description="Add node A"
         )
         
         self.assertEqual(op.operation_type, "add_node")
-        self.assertEqual(op.plugin_name, "TestPlugin")
         self.assertEqual(op.parameters["node_id"], "A")
         self.assertEqual(op.description, "Add node A")
         self.assertIsNotNone(op.operation_id)
         self.assertIsNotNone(op.timestamp)
+        self.assertFalse(hasattr(op, "plugin_name"))
     
-    def test_operation_without_plugin(self):
-        """Test creating an operation without plugin."""
+    def test_operation_without_optional_fields(self):
+        """Test creating an operation with only the required field."""
         op = Operation(operation_type="manual_edit")
         
         self.assertEqual(op.operation_type, "manual_edit")
-        self.assertIsNone(op.plugin_name)
         self.assertEqual(op.parameters, {})
         self.assertEqual(op.description, "manual_edit")
+        self.assertFalse(hasattr(op, "plugin_name"))
 
 
 class TestWorkspace(unittest.TestCase):
@@ -61,10 +61,14 @@ class TestWorkspace(unittest.TestCase):
     
     def test_workspace_creation(self):
         """Test creating a workspace."""
+        data_source_plugin = object()
+        visualizer_plugin = object()
         ws = Workspace(
             workspace_id="ws1",
             base_graph=self.graph,
             name="Test Workspace",
+            data_source_plugin=data_source_plugin,
+            visualizer_plugin=visualizer_plugin,
             metadata={"author": "TestUser"}
         )
         
@@ -72,6 +76,8 @@ class TestWorkspace(unittest.TestCase):
         self.assertEqual(ws.name, "Test Workspace")
         self.assertEqual(len(ws.base_graph.nodes), 3)
         self.assertEqual(len(ws.current_graph.nodes), 3)
+        self.assertIs(ws.data_source_plugin, data_source_plugin)
+        self.assertIs(ws.visualizer_plugin, visualizer_plugin)
         self.assertEqual(ws.metadata["author"], "TestUser")
         self.assertIsNone(ws.selected_node_id)
         self.assertEqual(len(ws.operation_history), 0)
@@ -99,7 +105,6 @@ class TestWorkspace(unittest.TestCase):
         ws.apply_operation(
             new_graph=modified_graph,
             operation_type="add_node",
-            plugin_name="TestPlugin",
             parameters={"node_id": "D"},
             description="Added node D"
         )
@@ -292,12 +297,24 @@ class TestWorkspace(unittest.TestCase):
         
         # Add operation
         graph1 = Graph(graph_id="g1", directed=True)
-        ws.apply_operation(graph1, "test_op", plugin_name="TestPlugin")
+        ws.apply_operation(graph1, "test_op")
         
         current_op = ws.get_current_operation()
         self.assertIsNotNone(current_op)
         self.assertEqual(current_op.operation_type, "test_op")
-        self.assertEqual(current_op.plugin_name, "TestPlugin")
+        self.assertFalse(hasattr(current_op, "plugin_name"))
+
+    def test_workspace_plugin_setters(self):
+        """Test assigning plugins directly to a workspace."""
+        ws = Workspace(workspace_id="ws1", base_graph=self.graph)
+        data_source_plugin = object()
+        visualizer_plugin = object()
+
+        ws.set_data_source_plugin(data_source_plugin)
+        ws.set_visualizer_plugin(visualizer_plugin)
+
+        self.assertIs(ws.data_source_plugin, data_source_plugin)
+        self.assertIs(ws.visualizer_plugin, visualizer_plugin)
 
 
 class TestWorkspaceManager(unittest.TestCase):
@@ -320,14 +337,20 @@ class TestWorkspaceManager(unittest.TestCase):
     def test_create_workspace(self):
         """Test creating a workspace through manager."""
         manager = WorkspaceManager()
+        data_source_plugin = object()
+        visualizer_plugin = object()
         
         ws = manager.create_workspace(
             base_graph=self.graph,
             workspace_id="ws1",
-            name="Test Workspace"
+            name="Test Workspace",
+            data_source_plugin=data_source_plugin,
+            visualizer_plugin=visualizer_plugin
         )
         
         self.assertEqual(ws.workspace_id, "ws1")
+        self.assertIs(ws.data_source_plugin, data_source_plugin)
+        self.assertIs(ws.visualizer_plugin, visualizer_plugin)
         self.assertEqual(len(manager.workspaces), 1)
         self.assertEqual(manager.active_workspace_id, "ws1")
     
