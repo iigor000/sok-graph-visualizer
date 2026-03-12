@@ -5,43 +5,56 @@ from sok_graph_visualizer.api.model.Node import Node
 from sok_graph_visualizer.api.model.Edge import Edge
 
 class CLITerminal:
-    def __init__(self, app, parser, executor):
+    """
+    Provides a command-line interface for interacting with the Sok Graph Visualizer.
+
+    The CLITerminal reads commands from the user, parses them using a CLIParser,
+    executes them through the application's CommandProcessor.
+
+    Attributes:
+        app (App): The main application instance, containing workspaces and command processor.
+        parser (CLIParser): The parser used to convert raw CLI strings into CLICommand objects.
+    """
+    def __init__(self, app, parser):
+        """
+        Initialize the CLITerminal.
+
+        Args:
+            app (App): The application instance.
+            parser (CLIParser): The CLI parser instance.
+        """
         self.app = app
         self.parser = parser
-        self.executor = executor
-
-    def print_graph(self):
-
-        workspace = self.app.workspace_manager.get_active_workspace()
-
-        if workspace is None:
-            print("No active workspace")
-            return
-
-        graph = workspace.current_graph
-
-        print("\n--- GRAPH ---")
-
-        print("Nodes:")
-        for node in graph.nodes.values():
-            print(f"{node.node_id} -> {node.attributes}")
-
-        print("\nEdges:")
-        for edge in graph.edges.values():
-            print(f"{edge.edge_id}: {edge.source} -> {edge.target} {edge.attributes}")
-
-        print("-------------\n")
-
 
     def run(self):
+        """
+        Run the CLI terminal loop, continuously reading user input.
+
+        Workflow:
+            1. Waits for input from the user (e.g., 'create node --id=1 --prop Name=Alice').
+            2. If input is "exit", terminates the loop.
+            3. Parses the input string using the CLIParser.
+            4. Executes the parsed command using the application's CommandProcessor.
+            5. Prints the result of the command execution (success or error message).
+
+        Exceptions:
+            Catches any exceptions during parsing or execution and prints an error message.
+        """
         while True:
             command = input("> ")
 
             if command == "exit":
                 break
 
-            parsed = self.parser.parse(command)
+            try:
+                parsed = self.parser.parse(command)
 
-            self.executor.execute(parsed)
+                success, message = self.app.command_processor.execute_command(
+                    parsed.name,
+                    parsed.params
+                )
 
-            self.print_graph()
+                print(message)
+
+            except Exception as e:
+                print(f"Error: {e}")

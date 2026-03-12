@@ -2,11 +2,20 @@
 from sok_graph_visualizer.core.src.commands.command_names import CommandNames
 from sok_graph_visualizer.core.src.commands.command_processor import CommandProcessor
 from sok_graph_visualizer.core.src.commands.filter_command import FilterCommand
+from sok_graph_visualizer.core.src.commands.graph_commands.clear_graph_command import ClearGraphCommand
+from sok_graph_visualizer.core.src.commands.graph_commands.create_edge_command import CreateEdgeCommand
+from sok_graph_visualizer.core.src.commands.graph_commands.create_node_command import CreateNodeCommand
+from sok_graph_visualizer.core.src.commands.graph_commands.delete_edge_command import DeleteEdgeCommand
+from sok_graph_visualizer.core.src.commands.graph_commands.delete_node_command import DeleteNodeCommand
+from sok_graph_visualizer.core.src.commands.graph_commands.edit_edge_command import EditEdgeCommand
+from sok_graph_visualizer.core.src.commands.graph_commands.edit_node_command import EditNodeCommand
 from sok_graph_visualizer.core.src.commands.search_command import SearchCommand
 from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
 from sok_graph_visualizer.core.src.use_cases.render_service import RenderService
+from sok_graph_visualizer.core.src.graph_query.graph_query_service import GraphQueryService
+
 
 
 class App():
@@ -25,6 +34,7 @@ class App():
         self.visualizer : VisualizerPlugin = None
         self.data_source_plugin : DataSourcePlugin = None
         self.command_processor = CommandProcessor()
+        self.graph_query_service = GraphQueryService()
 
         self.register_commands()
 
@@ -49,6 +59,49 @@ class App():
                 args=args
             )
         )
+
+        # CREATE NODE
+        self.command_processor.register_command(
+            CommandNames.CREATE_NODE,
+            lambda args: CreateNodeCommand(self.workspace_manager, args)
+        )
+
+        # EDIT NODE
+        self.command_processor.register_command(
+            CommandNames.EDIT_NODE,
+            lambda args: EditNodeCommand(self.workspace_manager, args)
+        )
+
+        # DELETE NODE
+        self.command_processor.register_command(
+            CommandNames.DELETE_NODE,
+            lambda args: DeleteNodeCommand(self.workspace_manager, args)
+        )
+
+        # CREATE EDGE
+        self.command_processor.register_command(
+            CommandNames.CREATE_EDGE,
+            lambda args: CreateEdgeCommand(self.workspace_manager, args)
+        )
+
+        # EDIT EDGE
+        self.command_processor.register_command(
+            CommandNames.EDIT_EDGE,
+            lambda args: EditEdgeCommand(self.workspace_manager, args)
+        )
+
+        # DELETE EDGE
+        self.command_processor.register_command(
+            CommandNames.DELETE_EDGE,
+            lambda args: DeleteEdgeCommand(self.workspace_manager, args)
+        )
+
+        # CLEAR GRAPH
+        self.command_processor.register_command(
+            CommandNames.CLEAR_GRAPH,
+            lambda args: ClearGraphCommand(self.workspace_manager, args)
+        )
+
     def render_graph(self):
         """
         Render the graph of the active workspace using the render service.

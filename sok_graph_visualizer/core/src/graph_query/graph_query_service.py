@@ -36,9 +36,9 @@ class GraphQueryService:
 
         for node in current_graph.nodes.values():
             if self._node_matches_filter(node, attribute_name, operator, value):
-                matching_node_ids.add(node)
+                matching_node_ids.add(node.node_id)
 
-            return current_graph.get_subgraph(matching_node_ids)
+        return current_graph.get_subgraph(matching_node_ids)
 
 
     def search(self, current_graph : Graph, query : str) -> Graph:
@@ -68,7 +68,7 @@ class GraphQueryService:
 
         return current_graph.get_subgraph(matching_node_ids)
     
-    def _node_matches_search(node : Node, query : str) -> bool:
+    def _node_matches_search(self, node : Node, query : str) -> bool:
         """
         Check if a node matches the search query.
         """

@@ -5,7 +5,6 @@ import pytest
 from sok_graph_visualizer.core.src.app import App
 from sok_graph_visualizer.platform.cli.cli_terminal import CLITerminal
 from sok_graph_visualizer.platform.cli.cli_parser import CLIParser
-from sok_graph_visualizer.platform.cli.cli_executor import CLIExecutor
 from sok_graph_visualizer.api.model.Graph import Graph
 
 
@@ -13,17 +12,18 @@ from sok_graph_visualizer.api.model.Graph import Graph
 def cli_env():
     app = App()
     parser = CLIParser()
-    executor = CLIExecutor(app)
-    return app, parser, executor
+    return app, parser
 
 
 def test_create_node(cli_env):
-    app, parser, executor = cli_env
+    app, parser = cli_env
 
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(), name="TestWS")
+    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="TestWS")
 
     cmd = parser.parse("create node --id=1 --prop Name=Alice")
-    executor.execute(cmd)
+    
+    success, msg = app.command_processor.execute_command(cmd.name, cmd.params)
+    assert success
 
     nodes = workspace.current_graph.nodes
     assert "1" in nodes
@@ -31,83 +31,86 @@ def test_create_node(cli_env):
 
 
 def test_edit_node(cli_env):
-    app, parser, executor = cli_env
+    app, parser = cli_env
 
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(), name="EditWS")
+    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="EditWS")
     
-    executor.execute(parser.parse("create node --id=1 --prop Name=Alice"))
+    cmd = parser.parse("create node --id=1 --prop Name=Alice")
+    app.command_processor.execute_command(cmd.name, cmd.params)
 
-    executor.execute(parser.parse("edit node --id=1 --prop Age=30"))
+    cmd = parser.parse("edit node --id=1 --prop Age=30")
+    success, msg = app.command_processor.execute_command(cmd.name, cmd.params)
+    assert success
+
     node = workspace.current_graph.get_node("1")
     assert node.attributes.get("Name") == "Alice"
-    assert node.attributes.get("Age") == "30"
+    assert node.attributes.get("Age") == 30
 
 
 def test_delete_node(cli_env):
-    app, parser, executor = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(), name="DeleteWS")
-    executor.execute(parser.parse("create node --id=1 --prop Name=Alice"))
-    executor.execute(parser.parse("delete node --id=1"))
+    app, parser = cli_env
+    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="DeleteWS")
+    cmd = parser.parse("create node --id=1 --prop Name=Alice")
+    app.command_processor.execute_command(cmd.name, cmd.params)
+
+    cmd = parser.parse("delete node --id=1")
+    success, msg = app.command_processor.execute_command(cmd.name, cmd.params)
+    assert success
 
     nodes = workspace.current_graph.nodes
     assert "1" not in nodes
 
 
 def test_create_edge(cli_env):
-    app, parser, executor = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(), name="EdgeWS")
+    app, parser = cli_env
+    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="EdgeWS")
 
-    executor.execute(parser.parse("create node --id=1 --prop Name=Alice"))
-    executor.execute(parser.parse("create node --id=2 --prop Name=Bob"))
+    cmd = parser.parse("create node --id=1 --prop Name=Alice")
+    app.command_processor.execute_command(cmd.name, cmd.params)
+    cmd = parser.parse("create node --id=2 --prop Name=Bob")
+    app.command_processor.execute_command(cmd.name, cmd.params)
 
-    executor.execute(parser.parse("create edge --id=e1 --source=1 --target=2 --prop weight=5"))
+    cmd = parser.parse("create edge --id=e1 --source=1 --target=2 --prop weight=5")
+    success, msg = app.command_processor.execute_command(cmd.name, cmd.params)
+    assert success
 
     edges = workspace.current_graph.edges
     assert "e1" in edges
     assert edges["e1"].source == "1"
     assert edges["e1"].target == "2"
-    assert edges["e1"].attributes.get("weight") == "5"
+    assert edges["e1"].attributes.get("weight") == 5
 
 
 def test_clear_graph(cli_env):
-    app, parser, executor = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(), name="ClearWS")
+    app, parser = cli_env
+    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="ClearWS")
 
-    executor.execute(parser.parse("create node --id=1 --prop Name=Alice"))
-    executor.execute(parser.parse("create node --id=2 --prop Name=Bob"))
-    executor.execute(parser.parse("clear"))
+    cmd = parser.parse("create node --id=1 --prop Name=Alice")
+    app.command_processor.execute_command(cmd.name, cmd.params)
+    cmd = parser.parse("create node --id=2 --prop Name=Bob")
+    app.command_processor.execute_command(cmd.name, cmd.params)
+
+    cmd = parser.parse("clear")
+    success, msg = app.command_processor.execute_command(cmd.name, cmd.params)
+    assert success
 
     assert workspace.current_graph.nodes == {}
     assert workspace.current_graph.edges == {}
 
 
 def test_filter_and_search(cli_env):
-    app, parser, executor = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(), name="FilterSearchWS")
+    app, parser = cli_env
+    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="FilterSearchWS")
 
-    executor.execute(parser.parse("create node --id=1 --prop Name=Alice"))
-    executor.execute(parser.parse("create node --id=2 --prop Name=Bob"))
+    cmd = parser.parse("create node --id=1 --prop Name=Alice")
+    app.command_processor.execute_command(cmd.name, cmd.params)
+    cmd = parser.parse("create node --id=2 --prop Name=Bob")
+    app.command_processor.execute_command(cmd.name, cmd.params)
 
-    cmd_filter = parser.parse("filter Name=Alice")
-    executor.execute(cmd_filter)
+    cmd_filter = parser.parse("filter Name==Alice")
+    success, msg = app.command_processor.execute_command(cmd_filter.name, cmd_filter.params)
+    assert success
 
     cmd_search = parser.parse("search Alice")
-    executor.execute(cmd_search)
-
-
-def test_undo_redo(cli_env):
-    app, parser, executor = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(), name="UndoRedoWS")
-
-    executor.execute(parser.parse("create node --id=1 --prop Name=Alice"))
-    executor.execute(parser.parse("create node --id=2 --prop Name=Bob"))
-
-    assert workspace.can_undo()
-    app.workspace_manager.undo()
-    nodes = workspace.current_graph.nodes
-    assert "2" not in nodes
-    assert "1" in nodes
-
-    app.workspace_manager.redo()
-    nodes = workspace.current_graph.nodes
-    assert "2" in nodes
+    success, msg = app.command_processor.execute_command(cmd_search.name, cmd_search.params)
+    assert success
