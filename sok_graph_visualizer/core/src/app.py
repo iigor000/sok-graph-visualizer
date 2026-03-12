@@ -10,6 +10,7 @@ from sok_graph_visualizer.core.src.commands.graph_commands.delete_node_command i
 from sok_graph_visualizer.core.src.commands.graph_commands.edit_edge_command import EditEdgeCommand
 from sok_graph_visualizer.core.src.commands.graph_commands.edit_node_command import EditNodeCommand
 from sok_graph_visualizer.core.src.commands.search_command import SearchCommand
+from sok_graph_visualizer.core.src.graph_query.graph_query_service import GraphQueryService
 from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
