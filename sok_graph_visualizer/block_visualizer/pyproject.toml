@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graph-block-visualizer"
+version = "0.1.0"
+description = "Block diagram visualizer plugin for Graph Visualization Platform"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+dependencies = [
+    "graph-api>=0.1.0",
+    "Jinja2>=3.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
