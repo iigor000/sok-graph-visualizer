@@ -29,14 +29,17 @@ var selfLoops = [
 ];
 
 const parentDiv = d3.select('#main');
+
 const width = parentDiv.node().clientWidth;
 const height = parentDiv.node().clientHeight;
+
 
 const svg = parentDiv.append('svg')
 	.attr('width', '100%')
 	.attr('height', '100%')
 	.attr('viewBox', `0 0 ${width} ${height}`)
 	.style('cursor', 'grab');
+
 
 // Container group to apply zoom/pan transforms
 const container = svg.append('g');
@@ -187,3 +190,7 @@ window.addEventListener('resize', () => {
 	simulation.alpha(0.5).restart();
 });
 
+window.highlightMainNode = function(nodeId) {
+    svg.selectAll('rect').attr('fill', '#000');
+    node.filter(d => d.id === nodeId).select('rect').attr('fill', 'red');
+};

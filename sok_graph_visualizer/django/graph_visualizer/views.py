@@ -310,10 +310,8 @@ def set_visualizer(request):
         body = json.loads(request.body)
         visualizer_id = body.get('visualizer_id')
         
-        print(f'[DEBUG] set_visualizer called with visualizer_id: {visualizer_id}')
         
         if not visualizer_id:
-            print('[DEBUG] No visualizer_id specified')
             return JsonResponse({'error': 'No visualizer_id specified'}, status=400)
         
         config = _get_app_config()
@@ -326,29 +324,21 @@ def set_visualizer(request):
         })
         
         if not success:
-            print(f'[DEBUG] select_visualizer failed: {message}')
             return JsonResponse({'success': False, 'error': message}, status=400)
         
         # Now render the graph with the new visualizer
         if workspace_manager.active_workspace_id is None:
-            print('[DEBUG] No active workspace')
             return JsonResponse({'error': 'No active workspace', 'success': False}, status=400)
         
         workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
         if workspace is None:
-            print(f'[DEBUG] Workspace not found: {workspace_manager.active_workspace_id}')
             return JsonResponse({'error': 'Active workspace not found', 'success': False}, status=400)
         
         visualizer = workspace.visualizer_plugin
         if visualizer is None:
-            print('[DEBUG] Visualizer not set after select_visualizer command')
             return JsonResponse({'error': 'Visualizer not set', 'success': False}, status=400)
         
-        print(f'[DEBUG] Rendering graph with visualizer: {visualizer.get_name()}')
         html = visualizer.render(workspace.current_graph)
-        print(f'[DEBUG] Visualizer returned HTML length: {len(html)}')
-        print(f'[DEBUG] First 200 chars: {html[:200]}')
-        print(f'[DEBUG] Contains <script> tag: {"<script>" in html}')
         
         # Wrap the visualizer script with the main SVG container
         # D3 is already loaded in base.html
@@ -381,3 +371,45 @@ def set_visualizer(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+    
+@require_http_methods(["GET"])
+def get_graph_data(request):
+    """
+    Return the active workspace's graph as JSON {nodes, edges}
+    for the Tree View.
+    """
+    try:
+        config = _get_app_config()
+        workspace_manager = config.workspace_manager
+
+        if workspace_manager.active_workspace_id is None:
+            return JsonResponse({"error": "No active workspace"}, status=404)
+
+        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
+        if workspace is None or workspace.current_graph is None:
+            return JsonResponse({"error": "No graph loaded"}, status=404)
+
+        graph = workspace.current_graph
+
+        nodes = []
+        for node_id, node in graph.nodes.items():
+            nodes.append({
+                "id": node_id,
+                "attributes": node.attributes or {}
+            })
+
+        edges = []
+        for edge_id, edge in graph.edges.items():
+            edges.append({
+                "id": edge_id,
+                "source": edge.source,
+                "target": edge.target,
+                "attributes": edge.attributes or {}
+            })
+
+        return JsonResponse({"nodes": nodes, "edges": edges})
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"error": str(e)}, status=500)

@@ -94,6 +94,26 @@ function renderConfigFields(selectedPlugin) {
         wrapper.appendChild(input);
         container.appendChild(wrapper);
     });
+
+    if (selectedPlugin.id === 'xml_datasource') {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'form-field';
+
+        const label = document.createElement('label');
+        label.setAttribute('for', 'config-reference_attr');
+        label.textContent = 'Reference attribute (optional, default: reference)';
+
+        const input = document.createElement('input');
+        input.id = 'config-reference_attr';
+        input.name = 'config.reference_attr';
+        input.type = 'text';
+        input.required = false;
+        input.placeholder = 'reference';
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        container.appendChild(wrapper);
+    }
 }
 
 function openModal() {
@@ -167,6 +187,10 @@ async function refreshWorkspaces() {
 
     const workspaces = await response.json();
     renderWorkspaceList(workspaces);
+
+    if (typeof loadTreeView === 'function') {
+        await loadTreeView();
+    }
 }
 
 async function createWorkspace(payload) {
