@@ -51,7 +51,7 @@ app = Flask(
     static_folder=str(Path(__file__).resolve().parent.parent / 'core' / 'src' / 'web' / 'static'),
     static_url_path='/static'
 )
-app.url_map.strict_slashes = False 
+app.url_map.strict_slashes = False # because trailing slashes
 
 # Add Jinja2 extension to ignore {% load %} tags
 app.jinja_env.add_extension(IgnoreLoadExtension)
