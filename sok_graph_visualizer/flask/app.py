@@ -51,6 +51,7 @@ app = Flask(
     static_folder=str(Path(__file__).resolve().parent.parent / 'core' / 'src' / 'web' / 'static'),
     static_url_path='/static'
 )
+app.url_map.strict_slashes = False 
 
 # Add Jinja2 extension to ignore {% load %} tags
 app.jinja_env.add_extension(IgnoreLoadExtension)
@@ -251,6 +252,81 @@ def health():
         'services_loaded': services_loaded
     })
 
+@app.route('/api/workspace/graph', methods=['GET'])
+def get_graph_data():
+    """Return active workspace graph as JSON for Tree View."""
+    if not services_loaded:
+        return jsonify({'error': 'Core services not loaded'}), 500
+
+    try:
+        workspace = workspace_manager.get_active_workspace()
+        if workspace is None or workspace.current_graph is None:
+            return jsonify({'error': 'No graph loaded'}), 404
+
+        graph = workspace.current_graph
+
+        nodes = [
+            {'id': nid, 'attributes': node.attributes or {}}
+            for nid, node in graph.nodes.items()
+        ]
+        edges = [
+            {'id': eid, 'source': edge.source, 'target': edge.target, 'attributes': edge.attributes or {}}
+            for eid, edge in graph.edges.items()
+        ]
+
+        return jsonify({'nodes': nodes, 'edges': edges})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/plugins/visualizers', methods=['GET'])
+def list_visualizer_plugins():
+    """List available visualizer plugins."""
+    if not services_loaded:
+        return jsonify({'error': 'Core services not loaded'}), 500
+
+    try:
+        plugins = [
+            {'id': pid, 'name': pid.replace('_', ' ').title()}
+            for pid in plugin_manager.get_visualizer_plugins().keys()
+        ]
+        return jsonify({'plugins': plugins})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/workspace/visualizer/', methods=['POST'])
+def set_visualizer():
+    """Set visualizer for active workspace and render graph."""
+    if not services_loaded:
+        return jsonify({'error': 'Core services not loaded'}), 500
+
+    payload = request.get_json(silent=True) or {}
+    visualizer_id = payload.get('visualizer_id')
+
+    if not visualizer_id:
+        return jsonify({'error': 'No visualizer_id specified'}), 400
+
+    try:
+        workspace = workspace_manager.get_active_workspace()
+        if workspace is None:
+            return jsonify({'error': 'No active workspace', 'success': False}), 400
+
+        visualizer = plugin_manager.instantiate_visualizer(visualizer_id)
+        workspace.visualizer_plugin = visualizer
+
+        html = visualizer.render(workspace.current_graph)
+
+        if '<script>' in html:
+            wrapped = f'<div id="main" style="width:100%;height:100%;position:relative;"></div>{html}'
+        else:
+            wrapped = f'<div id="main" style="width:100%;height:100%;position:relative;"></div><script>{html}</script>'
+
+        return jsonify({'success': True, 'html': wrapped, 'message': 'Visualizer set'})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e), 'success': False}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
