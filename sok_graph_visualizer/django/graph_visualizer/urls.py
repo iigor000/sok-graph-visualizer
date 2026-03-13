@@ -19,6 +19,9 @@ urlpatterns = [
     path('api/plugins/data-sources/', views.list_data_source_plugins, name='api_list_data_source_plugins'),
     path('api/plugins/visualizers/', views.list_visualizer_plugins, name='api_list_visualizer_plugins'),
 
+    path('api/search/', views.search, name = 'api_search_graph' ),
+    path('api/filter/', views.filter, name = 'api_filter_graph'),
+    path('api/workspace/reset/', views.reset_graph, name='api_reset_graph'),
     # Health check
     path('health/', views.health, name='health'),
 ]
