@@ -150,7 +150,7 @@ def render_graph():
 
 # API Endpoints
 
-@app.route('/api/workspaces/', methods=['GET'])
+@app.route('/api/workspaces', methods=['GET'])
 def list_workspaces():
     """List all workspaces"""
     if not services_loaded:
@@ -163,33 +163,23 @@ def list_workspaces():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/workspaces/', methods=['POST'])
+@app.route('/api/workspaces', methods=['POST'])
 def create_workspace():
     """Create a workspace using selected data source plugin and configuration."""
+    if not services_loaded:
+        return jsonify({'success': False, 'error': 'Core services not loaded'}), 500
+
+    payload = request.get_json(silent=True) or {}
+    name = payload.get('name')
+    data_source_id = payload.get('data_source_id')
+    config = payload.get('config', {})
+
+    if not name:
+        return jsonify({'success': False, 'error': "Missing 'name'"}), 400
+    if not data_source_id:
+        return jsonify({'success': False, 'error': "Missing 'data_source_id'"}), 400
+
     try:
-        if not services_loaded:
-            return jsonify({
-                'success': False,
-                'error': 'Core services not loaded'
-            }), 500
-
-        payload = request.get_json(silent=True) or {}
-        name = payload.get('name')
-        data_source_id = payload.get('data_source_id')
-        config = payload.get('config', {})
-
-        if not name:
-            return jsonify({
-                'success': False,
-                'error': "Missing required field: 'name'"
-            }), 400
-        if not data_source_id:
-            return jsonify({
-                'success': False,
-                'error': "Missing required field: 'data_source_id'"
-            }), 400
-
-        # Create the workspace using the data source plugin
         data_source_plugin = plugin_manager.instantiate_data_source(data_source_id, config=config)
         graph = data_source_plugin.parse()
         workspace = workspace_manager.create_workspace(
@@ -202,22 +192,14 @@ def create_workspace():
 
         return jsonify({
             'success': True,
-            'id': workspace.workspace_id,
-            'name': workspace.name,
-            'data_source_id': data_source_id,
-            'config': config
+            'workspace': _serialize_workspace(workspace),
+            'message': f'Created workspace {workspace.name}'
         }), 201
     except Exception as e:
-        import traceback
-        print(f"Error creating workspace: {e}")
-        traceback.print_exc()
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({'success': False, 'error': f'Failed to create workspace: {str(e)}'}), 400
 
 
-@app.route('/api/plugins/data-sources/', methods=['GET'])
+@app.route('/api/plugins/data-sources', methods=['GET'])
 def list_data_source_plugins():
     """List available data source plugins and their required config fields."""
     if not services_loaded:
@@ -239,105 +221,6 @@ def list_data_source_plugins():
         return jsonify({'plugins': plugins})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/plugins/visualizers/', methods=['GET'])
-def list_visualizer_plugins():
-    """List available visualizer plugins."""
-    if not services_loaded:
-        return jsonify({'error': 'Core services not loaded'}), 500
-
-    try:
-        visualizers = plugin_manager._data_visualizers or {}
-        if not visualizers:
-            return jsonify({'plugins': []})
-
-        plugins = []
-        
-        # Get visualizer names - use simple visualization based on class name
-        for plugin_id in visualizers.keys():
-            plugin_data = {
-                'id': plugin_id,
-                'name': plugin_id.replace('_', ' ').title()  # e.g., "simple_visualizer" -> "Simple Visualizer"
-            }
-            plugins.append(plugin_data)
-        
-        return jsonify({'plugins': plugins})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/workspace/visualizer/', methods=['POST'])
-def set_visualizer():
-    """Set the visualizer for the active workspace and render the graph."""
-    if not services_loaded:
-        return jsonify({'success': False, 'error': 'Core services not loaded'}), 500
-
-    try:
-        payload = request.get_json(silent=True) or {}
-        visualizer_id = payload.get('visualizer_id')
-        
-        print(f'[DEBUG] set_visualizer called with visualizer_id: {visualizer_id}')
-        
-        if not visualizer_id:
-            print('[DEBUG] No visualizer_id specified')
-            return jsonify({'error': 'No visualizer_id specified', 'success': False}), 400
-        
-        # Get the active workspace
-        if workspace_manager.active_workspace_id is None:
-            print('[DEBUG] No active workspace')
-            return jsonify({'error': 'No active workspace', 'success': False}), 400
-        
-        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
-        if workspace is None:
-            print(f'[DEBUG] Workspace not found: {workspace_manager.active_workspace_id}')
-            return jsonify({'error': 'Active workspace not found', 'success': False}), 400
-        
-        # Get the visualizer plugin
-        visualizers = plugin_manager._data_visualizers or {}
-        if visualizer_id not in visualizers:
-            return jsonify({'error': f'Visualizer not found: {visualizer_id}', 'success': False}), 400
-        
-        # Instantiate the visualizer and set it on the workspace
-        visualizer_class = visualizers[visualizer_id]
-        visualizer = visualizer_class()
-        workspace.visualizer_plugin = visualizer
-        
-        print(f'[DEBUG] Rendering graph with visualizer: {visualizer.get_name()}')
-        html = visualizer.render(workspace.current_graph)
-        print(f'[DEBUG] Visualizer returned HTML length: {len(html)}')
-        print(f'[DEBUG] First 200 chars: {html[:200]}')
-        print(f'[DEBUG] Contains <script> tag: {"<script>" in html}')
-        
-        # Wrap the visualizer script with the main SVG container
-        # D3 is already loaded in base.html
-        if '<script>' in html:
-            wrapped_html = f'''
-        <div id="main" style="width: 100%; height: 100%; position: relative;"></div>
-        {html}
-        '''
-        else:
-            # Wrap javascript code in script tags
-            wrapped_html = f'''
-        <div id="main" style="width: 100%; height: 100%; position: relative;"></div>
-        <script>
-{html}
-        </script>
-        '''
-        
-        print(f'[DEBUG] Wrapped HTML length: {len(wrapped_html)}')
-        print(f'[DEBUG] Wrapped HTML first 300 chars: {wrapped_html[:300]}')
-        
-        return jsonify({
-            'success': True,
-            'message': f'Switched to {visualizer.get_name()}',
-            'html': wrapped_html
-        })
-    except Exception as e:
-        import traceback
-        print(f"Error setting visualizer: {e}")
-        traceback.print_exc()
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/workspace/<workspace_id>', methods=['GET'])
