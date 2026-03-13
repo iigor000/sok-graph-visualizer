@@ -30,7 +30,7 @@ class XmlDataSourceService(DataSourcePlugin):
     Usage example
     -------------
     plugin = XmlDataSourceService(config={
-        "file_path": "xml_datasource/data/cyclic_transit_network.xml",
+        "file_path": "sok_graph_visualizer/xml_datasource/data/graph.xml",
         "directed": "true",
         "reference_attr": "reference",
     })

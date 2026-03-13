@@ -2,10 +2,6 @@ from importlib.metadata import entry_points
 import logging
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
-from sok_graph_visualizer.rdf_datasource.src.implementation import RDFDataSourcePlugin
-from sok_graph_visualizer.json_data_source.src.implementation import JsonDataSourcePlugin
-from sok_graph_visualizer.simple_visualizer.src.simple_visualizer import SimpleVisualizer
-from sok_graph_visualizer.block_visualizer.src.block_visualizer import BlockVisualizer
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +16,8 @@ class PluginManager:
 
         these registries are populated when plugins are loaded.
         """
-        self._data_sources = {"rdf_data_source": RDFDataSourcePlugin, "json_data_source": JsonDataSourcePlugin}
-        self._data_visualizers = {"simple_visualizer": SimpleVisualizer, "block_visualizer": BlockVisualizer}
+        self._data_sources = {}
+        self._data_visualizers = {}
 
     def load_plugins(self):
         """
@@ -36,9 +32,6 @@ class PluginManager:
         """
         self._data_sources.clear()
         self._data_visualizers.clear()
-
-        #self._data_sources = {"rdf_data_source": RDFDataSourcePlugin, "json_data_source": JsonDataSourcePlugin}
-        #self._data_visualizers = {"simple_visualizer": SimpleVisualizer, "block_visualizer": BlockVisualizer}
 
         ds_entry_points = entry_points(group="graph.data_source")
         for ep in ds_entry_points:
