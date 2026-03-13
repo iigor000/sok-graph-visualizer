@@ -15,7 +15,7 @@ dependencies = [
     "Jinja2>=3.0",
 ]
 
-[project.entry-points."graph.data_visualizer"]
+[project.entry-points."graph.visualizer"]
 block_visualizer = "sok_graph_visualizer.block_visualizer.src.block_visualizer:BlockVisualizer"
 
 [tool.setuptools.packages.find]
