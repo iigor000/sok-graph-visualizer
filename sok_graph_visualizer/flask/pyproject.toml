@@ -3,20 +3,18 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "block-visualizer"
+name = "flask-graph-visualizer"
 version = "0.1.0"
-description = "Block diagram visualizer plugin for Graph Visualization Platform"
+description = "Flask web application for SOK Graph Visualizer"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 
 dependencies = [
-    "api>=0.1.0",
+    "Flask>=2.0",
+    "core>=0.1.0",
     "Jinja2>=3.0",
 ]
-
-[project.entry-points."graph.visualizer"]
-block_visualizer = "sok_graph_visualizer.block_visualizer.src.block_visualizer:BlockVisualizer"
 
 [tool.setuptools.packages.find]
 where = ["."]
