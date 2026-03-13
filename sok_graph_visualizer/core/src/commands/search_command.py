@@ -3,8 +3,8 @@ from typing import Any, Dict, Tuple
 from sok_graph_visualizer.core.src.commands.command import Command
 from sok_graph_visualizer.core.src.commands.command_names import CommandNames
 from sok_graph_visualizer.core.src.graph_query.graph_query_service import GraphQueryService
-from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
 from sok_graph_visualizer.core.src.workspace.workspace import Workspace
+from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 
 
 class SearchCommand(Command) :
@@ -15,16 +15,16 @@ class SearchCommand(Command) :
     GraphQueryService, and stores the resulting graph as a new operation
     in the workspace history.
     """
-    def __init__(self, workspace_context : WorkspaceContext, graph_query_service : GraphQueryService, args : Dict[str, Any]) -> None:
+    def __init__(self, workspace_manager : WorkspaceManager, graph_query_service : GraphQueryService, args : Dict[str, Any]) -> None:
         """
         Initialize the SearchCommand.
 
         Args:
-            workspace_context: Context used to access the active workspace.
+            workspace_manager: Manager used to access the active workspace.
             graph_query_service: Service responsible for executing graph queries.
             args: Dictionary containing command parameters (expects 'expression').
         """
-        self.workspace_context = workspace_context
+        self.workspace_manager = workspace_manager
         self.graph_query_service = graph_query_service
         self.args = args
 
@@ -37,7 +37,7 @@ class SearchCommand(Command) :
                 - success flag
                 - message describing the result
         """
-        active_workspace : Workspace | None = self.workspace_context.get_active_workspace()
+        active_workspace : Workspace | None = self.workspace_manager.get_active_workspace()
         if active_workspace is None:
             return False, f"No active workspace"
         

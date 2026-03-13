@@ -1,7 +1,7 @@
 from typing import Any, Dict, Tuple
 from sok_graph_visualizer.api.model.Edge import Edge
 from sok_graph_visualizer.core.src.commands.command import Command
-from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
+from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.model.Node import Node
 
 
@@ -17,22 +17,22 @@ class EditNodeCommand(Command):
     not mentioned remain unchanged.
 
     Attributes:
-        workspace_context (WorkspaceContext): Context used to access the active workspace.
+        workspace_manager (WorkspaceManager): Manager used to access the active workspace.
         args (Dict[str, Any]): Dictionary containing command parameters:
             - id (str): Identifier of the node to edit.
             - properties (Dict[str, Any], optional): Key-value pairs of attributes 
               to update on the node.
     """
 
-    def __init__(self, workspace_context: WorkspaceContext, args: Dict[str, Any]):
+    def __init__(self, workspace_manager: WorkspaceManager, args: Dict[str, Any]):
         """
         Initialize the EditNodeCommand.
 
         Args:
-            workspace_context (WorkspaceContext): Context used to retrieve the active workspace.
+            workspace_manager (WorkspaceManager): Manager used to retrieve the active workspace.
             args (Dict[str, Any]): Dictionary containing the node ID and optional properties to update.
         """
-        self.workspace_context = workspace_context
+        self.workspace_manager = workspace_manager
         self.args = args
 
     def execute(self) -> Tuple[bool, str]:
@@ -54,7 +54,7 @@ class EditNodeCommand(Command):
                 - success (bool): True if the node was updated successfully, False otherwise.
                 - message (str): Human-readable description of the result.
         """
-        workspace = self.workspace_context.get_active_workspace()
+        workspace = self.workspace_manager.get_active_workspace()
 
         if workspace is None:
             return False, "No active workspace"

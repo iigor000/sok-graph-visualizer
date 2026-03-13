@@ -1,7 +1,7 @@
 from typing import Any, Dict, Tuple
 from sok_graph_visualizer.api.model.Edge import Edge
 from sok_graph_visualizer.core.src.commands.command import Command
-from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
+from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 
 class CreateEdgeCommand(Command):
     """
@@ -11,7 +11,7 @@ class CreateEdgeCommand(Command):
     using the provided parameters, and adds it to the current graph.
     
     Attributes:
-        workspace_context (WorkspaceContext): Context to access the active workspace.
+        workspace_manager (WorkspaceManager): Manager to access the active workspace.
         args (Dict[str, Any]): Dictionary containing command parameters such as:
             - id (str): Unique identifier for the new edge.
             - source (str): Node ID of the edge's source.
@@ -19,15 +19,15 @@ class CreateEdgeCommand(Command):
             - properties (Dict[str, Any], optional): Edge attributes.
     """
 
-    def __init__(self, workspace_context: WorkspaceContext, args: Dict[str, Any]):
+    def __init__(self, workspace_manager: WorkspaceManager, args: Dict[str, Any]):
         """
         Initialize the CreateEdgeCommand.
 
         Args:
-            workspace_context (WorkspaceContext): The context used to get the active workspace.
+            workspace_manager (WorkspaceManager): The manager used to get the active workspace.
             args (Dict[str, Any]): Dictionary of parameters for the new edge.
         """
-        self.workspace_context = workspace_context
+        self.workspace_manager = workspace_manager
         self.args = args
 
     def execute(self) -> Tuple[bool, str]:
@@ -35,7 +35,7 @@ class CreateEdgeCommand(Command):
         Execute the edge creation operation.
 
         Steps:
-            1. Retrieve the active workspace from the workspace context.
+            1. Retrieve the active workspace from the workspace manager.
             2. If no workspace is active, return a failure message.
             3. Access the current graph.
             4. Retrieve edge parameters from `args`:
@@ -51,7 +51,7 @@ class CreateEdgeCommand(Command):
                 - success (bool): True if the edge was created successfully, False otherwise.
                 - message (str): Human-readable message describing the result.
         """
-        workspace = self.workspace_context.get_active_workspace()
+        workspace = self.workspace_manager.get_active_workspace()
 
         if workspace is None:
             return False, "No active workspace"

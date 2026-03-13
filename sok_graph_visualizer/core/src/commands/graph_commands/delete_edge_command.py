@@ -1,7 +1,7 @@
 from typing import Any, Dict, Tuple
 from sok_graph_visualizer.api.model.Edge import Edge
 from sok_graph_visualizer.core.src.commands.command import Command
-from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
+from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 
 class DeleteEdgeCommand(Command):
     """
@@ -11,20 +11,20 @@ class DeleteEdgeCommand(Command):
     and removes it from the current graph if it exists.
 
     Attributes:
-        workspace_context (WorkspaceContext): Context to access the active workspace.
+        workspace_manager (WorkspaceManager): Manager to access the active workspace.
         args (Dict[str, Any]): Dictionary containing command parameters:
             - id (str): Identifier of the edge to be deleted.
     """
 
-    def __init__(self, workspace_context: WorkspaceContext, args: Dict[str, Any]):
+    def __init__(self, workspace_manager: WorkspaceManager, args: Dict[str, Any]):
         """
         Initialize the DeleteEdgeCommand.
 
         Args:
-            workspace_context (WorkspaceContext): Context to retrieve the active workspace.
+            workspace_manager (WorkspaceManager): Manager to retrieve the active workspace.
             args (Dict[str, Any]): Dictionary containing the edge ID to delete.
         """
-        self.workspace_context = workspace_context
+        self.workspace_manager = workspace_manager
         self.args = args
 
     def execute(self) -> Tuple[bool, str]:
@@ -46,7 +46,7 @@ class DeleteEdgeCommand(Command):
                 - success (bool): True if the edge was deleted successfully, False otherwise.
                 - message (str): Human-readable description of the result.
         """
-        workspace = self.workspace_context.get_active_workspace()
+        workspace = self.workspace_manager.get_active_workspace()
 
         if workspace is None:
             return False, "No active workspace"
