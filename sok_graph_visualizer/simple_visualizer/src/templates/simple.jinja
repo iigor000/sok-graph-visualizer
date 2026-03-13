@@ -204,4 +204,9 @@ window.addEventListener("resize", function () {
     simulation.alpha(1).restart();
 });
 
+window.highlightMainNode = function(nodeId) {
+    node.attr("fill", "black");
+    node.filter(d => d.id === nodeId).attr("fill", "red");
+}
+
 </script>

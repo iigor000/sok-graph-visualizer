@@ -187,3 +187,7 @@ window.addEventListener('resize', () => {
 	simulation.alpha(0.5).restart();
 });
 
+window.highlightMainNode = function(nodeId) {
+    svg.selectAll('rect').attr('fill', '#000');
+    node.filter(d => d.id === nodeId).select('rect').attr('fill', 'red');
+};

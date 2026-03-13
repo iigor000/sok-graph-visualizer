@@ -381,3 +381,45 @@ def set_visualizer(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+    
+@require_http_methods(["GET"])
+def get_graph_data(request):
+    """
+    Return the active workspace's graph as JSON {nodes, edges}
+    for the Tree View.
+    """
+    try:
+        config = _get_app_config()
+        workspace_manager = config.workspace_manager
+
+        if workspace_manager.active_workspace_id is None:
+            return JsonResponse({"error": "No active workspace"}, status=404)
+
+        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
+        if workspace is None or workspace.current_graph is None:
+            return JsonResponse({"error": "No graph loaded"}, status=404)
+
+        graph = workspace.current_graph
+
+        nodes = []
+        for node_id, node in graph.nodes.items():
+            nodes.append({
+                "id": node_id,
+                "attributes": node.attributes or {}
+            })
+
+        edges = []
+        for edge_id, edge in graph.edges.items():
+            edges.append({
+                "id": edge_id,
+                "source": edge.source,
+                "target": edge.target,
+                "attributes": edge.attributes or {}
+            })
+
+        return JsonResponse({"nodes": nodes, "edges": edges})
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"error": str(e)}, status=500)

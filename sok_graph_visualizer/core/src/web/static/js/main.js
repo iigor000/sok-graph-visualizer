@@ -284,6 +284,9 @@ async function selectVisualizer(visualizerId) {
                             setTimeout(() => {
                                 console.log('[DEBUG] selectVisualizer - calling initializeVisualization');
                                 initializeVisualization();
+                                if (typeof loadTreeView === 'function') {
+                                    loadTreeView();
+                                }
                             }, 100);
                         }
                     };

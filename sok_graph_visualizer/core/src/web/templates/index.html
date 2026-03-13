@@ -12,8 +12,8 @@
         <!-- Tree View -->
         <div class="tree-view">
             <h3>Tree View</h3>
-            <div class="tree-view-content">
-                <p>Graph tree structure will appear here</p>
+            <div class="tree-view-content" id="tree-view-content">
+                <p class="tree-loading">Select a workspace to load the graph.</p>
             </div>
         </div>
 
@@ -70,4 +70,5 @@
 
 {% block extra_js %}
 <script src="{{ 'js/workspace.js'|static }}"></script>
+<script src="{{ 'js/tree.js'|static }}"></script>
 {% endblock %}

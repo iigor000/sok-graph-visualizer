@@ -311,17 +311,6 @@ body {
     color: var(--dark-color);
 }
 
-.tree-view-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    font-size: 12px;
-    color: #666;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .bird-view-content {
     flex: 1;
     overflow: hidden;
@@ -524,4 +513,140 @@ body {
     .middle-panel {
         flex-direction: column;
     }
+}
+
+/* ── Tree View additions ─────────────────────────────────────── */
+
+.tree-view-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 10px;
+    font-size: 12px;
+    color: #666;
+    display: block;
+    white-space: nowrap;
+}
+
+.tree-loading {
+    padding: 12px;
+    color: #999;
+    font-style: italic;
+    font-family: sans-serif;
+}
+
+.tree-error {
+    padding: 12px;
+    color: var(--danger-color);
+    font-family: sans-serif;
+}
+
+.tree-info-bar {
+    padding: 4px 10px 6px 10px;
+    font-size: 11px;
+    color: #999;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2px;
+    font-family: sans-serif;
+}
+
+/* Liste */
+.tree-root,
+.tree-children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.tree-children {
+    padding-left: 14px;
+    border-left: 1px solid #ddd;
+    margin-left: 8px;
+}
+
+.tree-node-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    cursor: default;
+    overflow: visible;
+    min-width: max-content;
+}
+
+.tree-node-row:hover {
+    background-color: var(--hover-bg);
+}
+
+.tree-toggle {
+    display: inline-block;
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 13px;
+    line-height: 1;
+    user-select: none;
+}
+
+.tree-toggle-btn {
+    cursor: pointer;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.tree-toggle-btn:hover {
+    color: var(--primary-hover);
+}
+
+.tree-toggle-leaf {
+    color: #ccc;
+}
+
+.tree-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--dark-color);
+}
+
+.tree-cycle-icon {
+    color: #42167f;
+}
+
+.tree-label.tree-cycle {
+    color: #42167f;
+    font-style: italic;
+}
+
+.tree-cycle-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 0 4px;
+    border-radius: 6px;
+    background: #42167f1f;
+    color: #42167f;
+    border: 1px solid #2e0d5d;
+    margin-left: 3px;
+    flex-shrink: 0;
+    font-family: sans-serif;
+}
+
+.tree-edge-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 0 4px;
+    border-radius: 6px;
+    background: #f0f0f0;
+    color: #999;
+    margin-left: 3px;
+    flex-shrink: 0;
+    font-family: sans-serif;
+}
+
+.tree-node-row.selected {
+    background-color: #42167f1f;
+    outline: 1px solid #42167f;
+    border-radius: 3px;
 }

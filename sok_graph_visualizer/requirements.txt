@@ -1,3 +1,4 @@
 Django
 jinja2
 rdflib
+lxml
