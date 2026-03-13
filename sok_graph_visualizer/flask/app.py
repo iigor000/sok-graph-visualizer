@@ -7,6 +7,8 @@ import sys
 from jinja2 import nodes
 from jinja2.ext import Extension
 
+from sok_graph_visualizer.core.src.commands.command_names import CommandNames
+
 # Add parent directories to path for imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -18,7 +20,7 @@ try:
     core_app = App()
     workspace_manager = core_app.workspace_manager
     plugin_manager = core_app.plugin_manager
-
+    command_processor = core_app.command_processor
     services_loaded = True
 except Exception as e:
     import traceback
@@ -328,5 +330,116 @@ def set_visualizer():
         traceback.print_exc()
         return jsonify({'error': str(e), 'success': False}), 500
 
+@app.route('/api/filter', methods=['POST'])
+def filter_graph():
+    """
+    Execute filter command over the active workspace
+    """
+    if not services_loaded:
+        return jsonify({'success': False, 'error': 'Core services not loaded'}), 500
+
+    try:
+        data = request.get_json(silent=True) or {}
+        expression = data.get("expression")
+
+        if not expression or not isinstance(expression, str):
+            return jsonify({
+                "success": False,
+                "error": "Filter expression is required!"
+            }), 400
+
+        success, message = command_processor.execute_command(
+            CommandNames.FILTER,
+            {"expression": expression}
+        )
+
+        status_code = 200 if success else 400
+        return jsonify({
+            "success": success,
+            "message": message
+        }), status_code
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route('/api/search', methods=['POST'])
+def search():
+    """
+    Execute search command over the active workspace
+    """
+    if not services_loaded:
+        return jsonify({'success': False, 'error': 'Core services not loaded'}), 500
+
+    try:
+        data = request.get_json(silent=True) or {}
+        expression = data.get("query")
+
+        if not expression or not isinstance(expression, str):
+            return jsonify({
+                "success": False,
+                "error": "Search expression is required!"
+            }), 400
+
+        success, message = command_processor.execute_command(
+            CommandNames.SEARCH,
+            {"expression": expression}
+        )
+
+        status_code = 200 if success else 400
+        return jsonify({
+            "success": success,
+            "message": message
+        }), status_code
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@app.route('/api/workspace/reset', methods=['POST'])
+def reset_graph():
+    """
+    Reset active workspace graph to the original base graph.
+    """
+    if not services_loaded:
+        return jsonify({'success': False, 'error': 'Core services not loaded'}), 500
+
+    try:
+        if workspace_manager.active_workspace_id is None:
+            return jsonify({
+                "success": False,
+                "error": "No active workspace"
+            }), 400
+
+        success = workspace_manager.reset_workspace()
+
+        if not success:
+            return jsonify({
+                "success": False,
+                "error": "Failed to reset workspace"
+            }), 400
+
+        return jsonify({
+            "success": True,
+            "message": "Graph reset to original state"
+        }), 200
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
