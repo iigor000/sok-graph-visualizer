@@ -1,0 +1,48 @@
+<!-- Left Panel: Workspaces -->
+<div class="workspace-panel">
+    <h3>Workspaces</h3>
+    <div id="workspace-feedback" class="workspace-feedback" hidden></div>
+    <div id="workspace-list" class="workspace-list">
+        {% if workspaces %}
+            {% for workspace in workspaces %}
+            <div class="workspace-item {% if workspace.active %}active{% endif %}" data-workspace-id="{{ workspace.id }}">
+                {{ workspace.name }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        <div id="open-create-workspace-modal" class="workspace-item workspace-item-create" {% if services_loaded == False %}style="opacity:0.5;pointer-events:none;"{% endif %}>
+            + Create Workspace
+        </div>
+    </div>
+</div>
+
+<div id="create-workspace-modal" class="workspace-modal" hidden>
+    <div class="workspace-modal-backdrop" data-close-modal="true"></div>
+    <div class="workspace-modal-content" role="dialog" aria-modal="true" aria-labelledby="create-workspace-title">
+        <div class="workspace-modal-header">
+            <h3 id="create-workspace-title">Create Workspace</h3>
+            <button type="button" class="workspace-modal-close" data-close-modal="true" aria-label="Close">&times;</button>
+        </div>
+
+        <form id="create-workspace-form" class="workspace-form">
+            <div class="form-field">
+                <label for="workspace-name">Workspace Name</label>
+                <input id="workspace-name" name="name" type="text" required placeholder="Enter workspace name" />
+            </div>
+
+            <div class="form-field">
+                <label for="data-source-select">Data Source Plugin</label>
+                <select id="data-source-select" name="data_source_id" required>
+                    <option value="">Select data source plugin</option>
+                </select>
+            </div>
+
+            <div id="data-source-config-fields" class="workspace-config-fields"></div>
+
+            <div class="workspace-modal-actions">
+                <button type="button" class="btn btn-secondary" data-close-modal="true">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>

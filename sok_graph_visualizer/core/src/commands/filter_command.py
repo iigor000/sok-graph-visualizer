@@ -49,7 +49,6 @@ class FilterCommand(Command) :
             active_workspace.apply_operation(
                 new_graph=filtered_graph,
                 operation_type=CommandNames.FILTER,
-                plugin_name=None,
                 parameters={"expression": expression},
                 description=f"Filter applied: {expression}"
             )

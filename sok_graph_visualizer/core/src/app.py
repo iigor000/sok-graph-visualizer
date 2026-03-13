@@ -10,12 +10,18 @@ from sok_graph_visualizer.core.src.commands.graph_commands.delete_node_command i
 from sok_graph_visualizer.core.src.commands.graph_commands.edit_edge_command import EditEdgeCommand
 from sok_graph_visualizer.core.src.commands.graph_commands.edit_node_command import EditNodeCommand
 from sok_graph_visualizer.core.src.commands.search_command import SearchCommand
+from sok_graph_visualizer.core.src.commands.workspace_commands import CreateWorkspaceCommand
+from sok_graph_visualizer.core.src.commands.workspace_commands import DeleteWorkspaceCommand
+from sok_graph_visualizer.core.src.commands.workspace_commands import RefreshDataSourceCommand
+from sok_graph_visualizer.core.src.commands.workspace_commands import SelectVisualizerCommand
+from sok_graph_visualizer.core.src.commands.workspace_commands import SelectWorkspaceCommand
+from sok_graph_visualizer.core.src.commands.workspace_commands import UpdateWorkspaceCommand
 from sok_graph_visualizer.core.src.graph_query.graph_query_service import GraphQueryService
+from sok_graph_visualizer.core.src.use_cases.plugin_recognition import PluginManager
 from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
 from sok_graph_visualizer.core.src.use_cases.render_service import RenderService
-from sok_graph_visualizer.core.src.graph_query.graph_query_service import GraphQueryService
 
 
 
@@ -34,6 +40,8 @@ class App():
         self.render_service = RenderService(self.workspace_manager)
         self.visualizer : VisualizerPlugin = None
         self.data_source_plugin : DataSourcePlugin = None
+        self.plugin_manager = PluginManager()
+        self.plugin_manager.load_plugins()
         self.command_processor = CommandProcessor()
         self.graph_query_service = GraphQueryService()
 
@@ -103,10 +111,49 @@ class App():
             lambda args: ClearGraphCommand(self.workspace_manager, args)
         )
 
+        # SELECT WORKSPACE
+        self.command_processor.register_command(
+            CommandNames.SELECT_WORKSPACE,
+            lambda args: SelectWorkspaceCommand(self.workspace_manager, args)
+        )
+
+        # CREATE WORKSPACE
+        self.command_processor.register_command(
+            CommandNames.CREATE_WORKSPACE,
+            lambda args: CreateWorkspaceCommand(self.workspace_manager, self.plugin_manager, args)
+        )
+
+        # UPDATE WORKSPACE
+        self.command_processor.register_command(
+            CommandNames.UPDATE_WORKSPACE,
+            lambda args: UpdateWorkspaceCommand(self.workspace_manager, self.plugin_manager, args)
+        )
+
+        # DELETE WORKSPACE
+        self.command_processor.register_command(
+            CommandNames.DELETE_WORKSPACE,
+            lambda args: DeleteWorkspaceCommand(self.workspace_manager, args)
+        )
+
+        # SELECT VISUALIZER
+        self.command_processor.register_command(
+            CommandNames.SELECT_VISUALIZER,
+            lambda args: SelectVisualizerCommand(self.workspace_manager, self.plugin_manager, args)
+        )
+
+        # REFRESH DATA SOURCE
+        self.command_processor.register_command(
+            CommandNames.REFRESH_DATA_SOURCE,
+            lambda args: RefreshDataSourceCommand(self.workspace_manager, args)
+        )
+
     def render_graph(self):
         """
         Render the graph of the active workspace using the render service.
         """
-        if self.visualizer is None:
+        active_workspace = self.workspace_manager.get_active_workspace()
+        if active_workspace is None:
+            raise RuntimeError("No active workspace")
+        if active_workspace.visualizer_plugin is None and self.render_service.visualizer is None:
             raise RuntimeError("No visualizer plugin selected")
         return self.render_service.render_active_workspace()

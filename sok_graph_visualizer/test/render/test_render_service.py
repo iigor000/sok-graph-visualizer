@@ -57,6 +57,16 @@ class TestRenderServiceInit(unittest.TestCase):
         rs.set_visualizer(vis)
         self.assertIs(rs.visualizer, vis)
 
+    def test_workspace_visualizer_is_used(self):
+        rs = RenderService(self.wm)
+        vis = MockVisualizer()
+        workspace = self.wm.get_active_workspace()
+        workspace.set_visualizer_plugin(vis)
+
+        result = rs.render_active_workspace()
+
+        self.assertEqual(result, '<html></html>')
+
 
 class TestRenderServiceRender(unittest.TestCase):
     """Tests for render_active_workspace."""
@@ -89,6 +99,16 @@ class TestRenderServiceRender(unittest.TestCase):
         rs = RenderService(self.wm)
         with self.assertRaises(RuntimeError):
             rs.render_active_workspace()
+
+    def test_render_uses_workspace_visualizer_when_service_has_none(self):
+        workspace = self.wm.get_active_workspace()
+        workspace.set_visualizer_plugin(MockVisualizer())
+        rs = RenderService(self.wm)
+
+        result = rs.render_active_workspace()
+
+        self.assertIn('data-node-id="A"', result)
+        self.assertIn('data-node-id="B"', result)
 
     def test_render_raises_when_active_workspace_missing(self):
         self.wm.active_workspace_id = "nonexistent"

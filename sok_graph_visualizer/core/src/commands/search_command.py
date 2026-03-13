@@ -51,7 +51,6 @@ class SearchCommand(Command) :
             active_workspace.apply_operation(
                 new_graph=searched_graph,
                 operation_type=CommandNames.SEARCH,
-                plugin_name=None,
                 parameters={"expression": expression},
                 description=f"Search applied: {expression}"
 

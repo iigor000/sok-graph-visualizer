@@ -1,26 +1,11 @@
 {% extends "base.html" %}
+{% load shared_filters %}
 
 {% block title %}SOK Graph Visualizer{% endblock %}
 
 {% block content %}
 <div class="container">
-    <!-- Left Panel: Workspaces -->
-    <div class="workspace-panel">
-        <h3>Workspaces</h3>
-        <div class="workspace-list">
-            {% if workspaces %}
-                {% for workspace in workspaces %}
-                <div class="workspace-item {% if workspace.active %}active{% endif %}" data-workspace-id="{{ workspace.id }}">
-                    {{ workspace.name }}
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="workspace-item active">Workspace 1</div>
-                <div class="workspace-item">Workspace 2</div>
-                <div class="workspace-item">Workspace 3</div>
-            {% endif %}
-        </div>
-    </div>
+    {% include "workspace.html" %}
 
     <!-- Middle Panel: Tree View and Bird View -->
     <div class="middle-panel">
@@ -64,4 +49,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ 'js/workspace.js'|static }}"></script>
 {% endblock %}

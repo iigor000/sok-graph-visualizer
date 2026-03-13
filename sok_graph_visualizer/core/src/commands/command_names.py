@@ -20,4 +20,12 @@ class CommandNames(str, Enum):
     # Graph commands
     CLEAR_GRAPH = "clear"
 
+    # Workspace commands
+    SELECT_WORKSPACE = "select_workspace"
+    CREATE_WORKSPACE = "create_workspace"
+    UPDATE_WORKSPACE = "update_workspace"
+    DELETE_WORKSPACE = "delete_workspace"
+    SELECT_VISUALIZER = "select_visualizer"
+    REFRESH_DATA_SOURCE = "refresh_data_source"
+
     #Other commands...

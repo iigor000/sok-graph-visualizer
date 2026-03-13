@@ -6,6 +6,8 @@ from typing import Dict, Optional, Any, List
 import uuid
 
 from .workspace import Workspace
+from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
+from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 
 
 class WorkspaceManager:
@@ -32,6 +34,8 @@ class WorkspaceManager:
         base_graph,
         workspace_id: Optional[str] = None,
         name: str = "",
+        data_source_plugin: Optional[DataSourcePlugin] = None,
+        visualizer_plugin: Optional[VisualizerPlugin] = None,
         metadata: Optional[Dict[str, Any]] = None,
         set_active: bool = True
     ) -> Workspace:
@@ -42,6 +46,8 @@ class WorkspaceManager:
             base_graph: The initial graph for the workspace
             workspace_id: Unique identifier (auto-generated if not provided)
             name: Human-readable name
+            data_source_plugin: Active data source plugin for the workspace
+            visualizer_plugin: Active visualizer plugin for the workspace
             metadata: Additional metadata
             set_active: Whether to set this as the active workspace
             
@@ -61,6 +67,8 @@ class WorkspaceManager:
             workspace_id=workspace_id,
             base_graph=base_graph,
             name=name,
+            data_source_plugin=data_source_plugin,
+            visualizer_plugin=visualizer_plugin,
             metadata=metadata
         )
         
