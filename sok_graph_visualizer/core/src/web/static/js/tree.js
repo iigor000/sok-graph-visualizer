@@ -257,8 +257,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadTreeView();
 });
 
+function highlightTreeNode(nodeId) {
+    document.querySelectorAll('.tree-node-row.selected')
+        .forEach(el => el.classList.remove('selected'));
+
+    const row = document.querySelector(`.tree-node-row[data-id="${CSS.escape(nodeId)}"]`);
+    if (row) {
+        row.classList.add('selected');
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+window.highlightTreeNode = highlightTreeNode;
+
 document.addEventListener('node-clicked', (e) => {
     highlightTreeNode(e.detail);
 });
-
-window.highlightTreeNode = highlightTreeNode;
