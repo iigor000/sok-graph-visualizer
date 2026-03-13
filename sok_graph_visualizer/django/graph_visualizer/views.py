@@ -1,12 +1,13 @@
 """
 Views for Graph Visualizer
 """
+import json
 from django.apps import apps
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-
+from sok_graph_visualizer.core.src.cli.cli_parser import CLIParser
 
 def _get_app_config():
     """
@@ -381,3 +382,52 @@ def set_visualizer(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def execute_cli_command(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    
+    try:
+        body = json.loads(request.body)
+        command_str = body.get('command')
+        config = _get_app_config()
+        parser = CLIParser()
+        
+        parsed = parser.parse(command_str)
+        success, message = config.command_processor.execute_command(parsed.name, parsed.params)
+        
+        status_text = ""
+        graph_html = ""
+
+        if success:
+            workspace = config.workspace_manager.get_active_workspace()
+            if workspace:
+                graph = workspace.current_graph
+                lines = [f"--- Current Graph State ---"]
+                lines.append(f"Nodes ({len(graph.nodes)}):")
+                for node in graph.nodes.values():
+                    attr_str = ", ".join([f"{k}: {v}" for k, v in node.attributes.items()])
+                    lines.append(f"  [ID: {node.node_id}]  {'{' + attr_str + '}'}")
+                
+                lines.append(f"\nEdges ({len(graph.edges)}):")
+                for edge in graph.edges.values():
+                    arrow = "->" if graph.directed else "--"
+                    edge_attr = f"  | {edge.attributes}" if edge.attributes else ""
+                    lines.append(f"  ({edge.edge_id}): {edge.source} {arrow} {edge.target}{edge_attr}")
+                
+                status_text = "\n".join(lines)
+                
+                if workspace.visualizer_plugin:
+                    graph_html = workspace.visualizer_plugin.render(graph)
+        else:
+            status_text = f"Command failed: {message}"
+
+        return JsonResponse({
+            'success': success,
+            'message': message,
+            'status_text': status_text,
+            'graph_html': graph_html
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'status_text': f"Error: {str(e)}"}, status=500)

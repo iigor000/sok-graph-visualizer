@@ -3,8 +3,8 @@
 import pytest
 
 from sok_graph_visualizer.core.src.app import App
-from sok_graph_visualizer.platform.cli.cli_terminal import CLITerminal
-from sok_graph_visualizer.platform.cli.cli_parser import CLIParser
+from sok_graph_visualizer.core.src.cli.cli_terminal import CLITerminal
+from sok_graph_visualizer.core.src.cli.cli_parser import CLIParser
 from sok_graph_visualizer.api.model.Graph import Graph
 
 

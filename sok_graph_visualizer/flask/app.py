@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 try:
     from sok_graph_visualizer.api.model.Graph import Graph
     from sok_graph_visualizer.core.src.app import App
+    from sok_graph_visualizer.core.src.cli.cli_parser import CLIParser
 
     # Initialize core application
     core_app = App()
@@ -251,6 +252,60 @@ def health():
         'services_loaded': services_loaded
     })
 
+@app.route('/api/cli/execute', methods=['POST'])
+def execute_cli_command():
+    if not services_loaded:
+        return jsonify({'success': False, 'message': 'Core services not loaded'}), 500
+
+    try:
+        data = request.get_json()
+        command_str = data.get('command')
+        
+        workspace = workspace_manager.get_active_workspace()
+        if not workspace:
+            return jsonify({'success': False, 'message': 'No active workspace found.'})
+
+        parser = CLIParser()
+        parsed = parser.parse(command_str)
+        
+        success, message = core_app.command_processor.execute_command(parsed.name, parsed.params)
+        
+        status_text = ""
+        graph_html = ""
+
+        if success:
+            graph = workspace.current_graph
+            lines = [f"=== GRAPH: {graph.name} ==="]
+            
+            lines.append(f"\nNODES ({len(graph.nodes)}):")
+            for node in graph.nodes.values():
+                attr_parts = [f"{k}={v}" for k, v in node.attributes.items()]
+                attr_str = ", ".join(attr_parts)
+                lines.append(f"  [ID: {node.node_id}]  {'{' + attr_str + '}'}")
+
+            lines.append(f"\nEDGES ({len(graph.edges)}):")
+            for edge in graph.edges.values():
+                arrow = "──▶" if graph.directed else "───"
+                attr_parts = [f"{k}={v}" for k, v in edge.attributes.items()]
+                edge_attr = "  |  " + ", ".join(attr_parts) if attr_parts else ""
+                lines.append(f"  ({edge.edge_id}): {edge.source} {arrow} {edge.target}{edge_attr}")
+
+            status_text = "\n".join(lines)
+            
+            if workspace.visualizer_plugin:
+                graph_html = workspace.visualizer_plugin.render(graph)
+        else:
+            status_text = f"Command failed: {message}"
+
+        return jsonify({
+            'success': success,
+            'message': message,
+            'status_text': status_text,
+            'graph_html': graph_html
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f"Error: {str(e)}"}), 50
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
