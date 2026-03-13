@@ -15,6 +15,9 @@ dependencies = [
     "Jinja2>=3.0",
 ]
 
+[project.entry-points."graph.data_visualizer"]
+block_visualizer = "sok_graph_visualizer.block_visualizer.src.block_visualizer:BlockVisualizer"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["*"]

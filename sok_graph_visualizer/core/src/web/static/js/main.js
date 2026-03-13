@@ -17,9 +17,16 @@ function getCsrfToken() {
     return cookieValue;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('SOK Graph Visualizer initialized');
 
+    // Load visualizer plugins
+    try {
+        await loadVisualizerPlugins();
+    } catch (error) {
+        console.error('[DEBUG] Error loading visualizer plugins:', error);
+    }
+    
     // Workspace management on index is handled by workspace.js
     if (document.getElementById('open-create-workspace-modal')) {
         return;
@@ -126,4 +133,505 @@ async function apiCall(endpoint, options = {}) {
         throw error;
     }
 }
+
+// Load and populate visualizer plugins
+async function loadVisualizerPlugins() {
+    const visualizerSelect = document.getElementById('visualizer-select');
+    if (!visualizerSelect) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/plugins/visualizers/');
+        
+        if (!response.ok) {
+            return;
+        }
+        
+        const pluginResponse = await response.json();
+        
+        const plugins = pluginResponse.plugins || [];
+        
+        // Add visualizer options
+        plugins.forEach((plugin) => {
+            const option = document.createElement('option');
+            option.value = plugin.id;
+            option.textContent = plugin.name;
+            visualizerSelect.appendChild(option);
+        });
+        
+        // Add change event listener
+        visualizerSelect.addEventListener('change', async function() {
+            const visualizerId = this.value;
+            
+            if (!visualizerId) {
+                return;
+            }
+            
+            try {
+                await selectVisualizer(visualizerId);
+            } catch (error) {
+                console.error('Error selecting visualizer:', error);
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error loading visualizer plugins:', error);
+    }
+}
+
+// Execute the SELECT_VISUALIZER command
+async function selectVisualizer(visualizerId) {
+    try {
+        // Clear previous visualization state
+        console.log('[DEBUG] selectVisualizer - clearing previous state');
+        vizState = {
+            mainScale: 1,
+            mainTranslate: { x: 0, y: 0 },
+            isDragging: false,
+            dragStart: { x: 0, y: 0 },
+            svg: null,
+            g: null
+        };
+        
+        // Get CSRF token for Django
+        const csrfToken = getCsrfToken();
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        if (csrfToken) {
+            headers['X-CSRFToken'] = csrfToken;
+        }
+        
+        console.log('[DEBUG] selectVisualizer - sending request for visualizer:', visualizerId);
+        
+        // Send request to set visualizer for active workspace
+        const response = await fetch('/api/workspace/visualizer/', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                visualizer_id: visualizerId
+            })
+        });
+        
+        console.log('[DEBUG] selectVisualizer - response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('[DEBUG] selectVisualizer - response received, success:', data.success);
+        
+        if (data.success) {
+            // Update the main view with the rendered graph
+            if (data.html) {
+                const mainViewContent = document.querySelector('.main-view-content');
+                console.log('[DEBUG] selectVisualizer - mainViewContent element found:', !!mainViewContent);
+                
+                if (mainViewContent) {
+                    // Clear the main view content completely
+                    mainViewContent.innerHTML = '';
+                    console.log('[DEBUG] selectVisualizer - main view cleared');
+                    
+                    // Clear bird view
+                    const birdViewCanvas = document.getElementById('bird-view-canvas');
+                    if (birdViewCanvas) {
+                        birdViewCanvas.innerHTML = '<p>Miniature graph overview will appear here</p>';
+                        console.log('[DEBUG] selectVisualizer - bird view cleared');
+                    }
+                    
+                    // Extract script tags and content from HTML
+                    const htmlContent = data.html;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlContent, 'text/html');
+                    
+                    // Get the main div and scripts
+                    const mainDiv = doc.querySelector('#main');
+                    const scripts = doc.querySelectorAll('script');
+                    
+                    console.log('[DEBUG] selectVisualizer - found main div:', !!mainDiv);
+                    console.log('[DEBUG] selectVisualizer - found scripts:', scripts.length);
+                    
+                    // Insert the main div
+                    if (mainDiv) {
+                        const mainDivClone = mainDiv.cloneNode(true);
+                        mainViewContent.appendChild(mainDivClone);
+                        console.log('[DEBUG] selectVisualizer - inserted main div');
+                    }
+                    
+                    // Execute scripts sequentially, each in its own scope
+                    let scriptIndex = 0;
+                    const executeNextScript = () => {
+                        if (scriptIndex < scripts.length) {
+                            const script = scripts[scriptIndex];
+                            console.log('[DEBUG] selectVisualizer - executing script', scriptIndex);
+                            const newScript = document.createElement('script');
+                            // Wrap script content in IIFE to avoid variable redeclaration errors
+                            const wrappedCode = '(function() {\n' + script.textContent + '\n})();';
+                            newScript.textContent = wrappedCode;
+                            newScript.onerror = (err) => {
+                                console.error('[DEBUG] Script error:', err);
+                                scriptIndex++;
+                                executeNextScript();
+                            };
+                            mainViewContent.appendChild(newScript);
+                            scriptIndex++;
+                            // Give a tiny bit of time between scripts
+                            setTimeout(executeNextScript, 10);
+                        } else {
+                            console.log('[DEBUG] selectVisualizer - all scripts executed');
+                            setTimeout(() => {
+                                console.log('[DEBUG] selectVisualizer - calling initializeVisualization');
+                                initializeVisualization();
+                            }, 100);
+                        }
+                    };
+                    executeNextScript();
+                }
+            }
+            
+            return true;
+        } else {
+            throw new Error(data.error || 'Failed to set visualizer');
+        }
+    } catch (error) {
+        console.error('Error in selectVisualizer:', error);
+        throw error;
+    }
+}
+
+// Visualization state
+let vizState = {
+    mainScale: 1,
+    mainTranslate: { x: 0, y: 0 },
+    isDragging: false,
+    dragStart: { x: 0, y: 0 },
+    svg: null,
+    g: null
+};
+
+// Initialize visualization with zoom, pan, and bird view
+function initializeVisualization() {
+    console.log('[DEBUG] initializeVisualization called');
+    
+    const mainViewCanvas = document.getElementById('main-view-canvas');
+    console.log('[DEBUG] main-view-canvas element:', !!mainViewCanvas);
+    
+    if (!mainViewCanvas) {
+        console.error('[DEBUG] main-view-canvas element not found');
+        return;
+    }
+    
+    // Try to find SVG in the main div
+    let mainSvg = mainViewCanvas.querySelector('#main svg');
+    console.log('[DEBUG] SVG from #main svg:', !!mainSvg);
+    
+    if (!mainSvg) {
+        mainSvg = mainViewCanvas.querySelector('svg');
+        console.log('[DEBUG] SVG from any svg:', !!mainSvg);
+    }
+    
+    if (!mainSvg) {
+        // Check if main div exists and what's inside it
+        const mainDiv = document.getElementById('main');
+        console.log('[DEBUG] Found main div:', !!mainDiv);
+        if (mainDiv) {
+            console.log('[DEBUG] main div innerHTML length:', mainDiv.innerHTML.length);
+            console.log('[DEBUG] main div children:', mainDiv.children.length);
+            mainSvg = mainDiv.querySelector('svg');
+            console.log('[DEBUG] SVG inside main div:', !!mainSvg);
+        }
+    }
+    
+    if (!mainSvg) {
+        console.error('[DEBUG] SVG not found! Checking all elements:');
+        console.log('[DEBUG] All SVGs on page:', document.querySelectorAll('svg').length);
+        const allSvgs = document.querySelectorAll('svg');
+        allSvgs.forEach((svg, i) => console.log(`[DEBUG] SVG ${i}:`, svg.parentElement.id, svg.parentElement.className));
+        return;
+    }
+    
+    console.log('[DEBUG] Found SVG, initializing...');
+    vizState.svg = mainSvg;
+    
+    // Create or get the main group
+    let g = mainSvg.querySelector('g');
+    console.log('[DEBUG] Found group:', !!g);
+    
+    if (!g) {
+        console.log('[DEBUG] Creating new group for SVG transform');
+        // If no group exists, wrap SVG content
+        const newG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        while (mainSvg.firstChild) {
+            newG.appendChild(mainSvg.firstChild);
+        }
+        mainSvg.appendChild(newG);
+        g = newG;
+    }
+    
+    vizState.g = g;
+    
+    // Set up main view zoom and pan
+    console.log('[DEBUG] About to call setupMainViewZoom');
+    setupMainViewZoom();
+    
+    // Set up bird view
+    setupBirdView();
+    
+    console.log('[DEBUG] Visualization initialized successfully');
+}
+
+// Set up zoom control buttons
+// Set up wheel zoom and pan
+function setupMainViewZoom() {
+    const mainSvg = vizState.svg;
+    const mainGroup = vizState.g;
+    
+    if (!mainSvg || !mainGroup) {
+        console.warn('[DEBUG] setupMainViewZoom - svg or group not found!');
+        return;
+    }
+    
+    console.log('[DEBUG] setupMainViewZoom - watching D3 transforms');
+    
+    // Watch for D3 transform changes on the main group
+    const observer = new MutationObserver(() => {
+        const transform = mainGroup.getAttribute('transform');
+        console.log('[DEBUG] D3 transform changed:', transform);
+        
+        if (transform) {
+            // Parse transform: "translate(x,y) scale(s)" or variations
+            const translateMatch = transform.match(/translate\(([-\d.]+)[,\s]+([-\d.]+)\)/);
+            const scaleMatch = transform.match(/scale\(([-\d.]+)\)/);
+            
+            if (translateMatch) {
+                vizState.mainTranslate.x = parseFloat(translateMatch[1]);
+                vizState.mainTranslate.y = parseFloat(translateMatch[2]);
+                console.log('[DEBUG] Extracted translate:', vizState.mainTranslate);
+            }
+            
+            if (scaleMatch) {
+                vizState.mainScale = parseFloat(scaleMatch[1]);
+                console.log('[DEBUG] Extracted scale:', vizState.mainScale);
+            }
+            
+            updateBirdViewRect();
+        }
+    });
+    
+    observer.observe(mainGroup, { attributes: true, attributeFilter: ['transform'] });
+    console.log('[DEBUG] MutationObserver attached to main group');
+}
+
+// Apply transform to main view
+function updateMainViewZoom() {
+    if (!vizState.g) {
+        return;
+    }
+    
+    const translateX = vizState.mainTranslate.x;
+    const translateY = vizState.mainTranslate.y;
+    const scale = vizState.mainScale;
+    
+    vizState.g.setAttribute('transform', 
+        `translate(${translateX},${translateY}) scale(${scale})`);
+}
+
+// Set up bird view
+function setupBirdView() {
+    const mainSvg = vizState.svg;
+    const birdViewCanvas = document.getElementById('bird-view-canvas');
+    
+    if (!mainSvg || !birdViewCanvas) {
+        console.warn('Missing SVG or bird view canvas');
+        return;
+    }
+    
+    // Clear previous bird view
+    birdViewCanvas.innerHTML = '';
+    
+    // Clone SVG for bird view
+    const birdSvg = mainSvg.cloneNode(true);
+    birdSvg.style.width = '100%';
+    birdSvg.style.height = '100%';
+    
+    // Get or set viewBox
+    let viewBox = mainSvg.getAttribute('viewBox');
+    if (!viewBox) {
+        try {
+            const bbox = mainSvg.getBBox();
+            viewBox = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+        } catch (e) {
+            viewBox = '0 0 800 600';
+        }
+        mainSvg.setAttribute('viewBox', viewBox);
+    }
+    
+    birdSvg.setAttribute('viewBox', viewBox);
+    birdViewCanvas.appendChild(birdSvg);
+    
+    // Create visible area rectangle
+    const viewBoxParts = viewBox.split(/[\s,]+/).map(Number);
+    const vbX = viewBoxParts[0];
+    const vbY = viewBoxParts[1];
+    const vbWidth = viewBoxParts[2];
+    const vbHeight = viewBoxParts[3];
+    
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.classList.add('bird-view-rect');
+    rect.setAttribute('x', vbX);
+    rect.setAttribute('y', vbY);
+    rect.setAttribute('width', vbWidth);
+    rect.setAttribute('height', vbHeight);
+    
+    // Add to SVG layers (on top)
+    const birdSvgGroup = birdSvg.querySelector('g');
+    if (birdSvgGroup && birdSvgGroup.parentNode === birdSvg) {
+        birdSvg.appendChild(rect);
+    } else {
+        birdSvg.appendChild(rect);
+    }
+    
+    // Make rectangle draggable to pan main view
+    let isDraggingRect = false;
+    
+    rect.addEventListener('mousedown', (e) => {
+        isDraggingRect = true;
+        e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (isDraggingRect) {
+            const birdRect = birdViewCanvas.getBoundingClientRect();
+            const rectX = e.clientX - birdRect.left;
+            const rectY = e.clientY - birdRect.top;
+            
+            // Calculate SVG coordinates
+            const svg = birdSvg;
+            const pt = svg.createSVGPoint();
+            pt.x = rectX;
+            pt.y = rectY;
+            const svgCoords = pt.matrixTransform(svg.getScreenCTM().inverse());
+            
+            // Calculate pan to center visible rectangle here
+            const rectWidth = parseFloat(rect.getAttribute('width'));
+            const rectHeight = parseFloat(rect.getAttribute('height'));
+            
+            vizState.mainTranslate.x = -(svgCoords.x * vizState.mainScale) + (birdRect.width / 2);
+            vizState.mainTranslate.y = -(svgCoords.y * vizState.mainScale) + (birdRect.height / 2);
+            
+            updateMainViewZoom();
+            updateBirdViewRect();
+        }
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDraggingRect = false;
+    });
+    
+    updateBirdViewRect();
+}
+
+// Update bird view rectangle position to match main view viewport
+function updateBirdViewRect() {
+    console.log('[DEBUG] updateBirdViewRect called');
+    const mainViewContent = document.querySelector('.main-view-content');
+    const birdViewCanvas = document.getElementById('bird-view-canvas');
+    const rect = birdViewCanvas ? birdViewCanvas.querySelector('.bird-view-rect') : null;
+    
+    console.log('[DEBUG] elements found - content:', !!mainViewContent, 'canvas:', !!birdViewCanvas, 'rect:', !!rect, 'svg:', !!vizState.svg);
+    
+    if (!mainViewContent) {
+        console.warn('[DEBUG] updateBirdViewRect - mainViewContent not found');
+        return;
+    }
+    if (!birdViewCanvas) {
+        console.warn('[DEBUG] updateBirdViewRect - birdViewCanvas not found');
+        return;
+    }
+    if (!rect) {
+        console.warn('[DEBUG] updateBirdViewRect - rect not found');
+        console.log('[DEBUG] checking bird-view-canvas contents:', birdViewCanvas.innerHTML.substring(0, 200));
+        return;
+    }
+    if (!vizState.svg) {
+        console.warn('[DEBUG] updateBirdViewRect - vizState.svg not found');
+        return;
+    }
+    
+    // Get the main SVG's viewBox
+    const mainSvg = vizState.svg;
+    let viewBoxStr = mainSvg.getAttribute('viewBox');
+    
+    // If no viewBox, calculate it from the SVG's bounding box
+    if (!viewBoxStr) {
+        console.log('[DEBUG] No viewBox found, calculating from SVG bounds');
+        try {
+            const bbox = mainSvg.getBBox();
+            console.log('[DEBUG] SVG bbox:', bbox);
+            viewBoxStr = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+            mainSvg.setAttribute('viewBox', viewBoxStr);
+            console.log('[DEBUG] Set viewBox to:', viewBoxStr);
+        } catch (e) {
+            console.warn('[DEBUG] Could not calculate viewBox:', e);
+            // Fallback viewBox
+            viewBoxStr = '0 0 800 600';
+            mainSvg.setAttribute('viewBox', viewBoxStr);
+        }
+    }
+    
+    const viewBoxParts = viewBoxStr.split(/[\s,]+/).map(Number);
+    const vbX = viewBoxParts[0];
+    const vbY = viewBoxParts[1];
+    const vbWidth = viewBoxParts[2];
+    const vbHeight = viewBoxParts[3];
+    
+    // Get the actual pixel dimensions of the main view container
+    const containerWidth = mainViewContent.clientWidth;
+    const containerHeight = mainViewContent.clientHeight;
+    
+    console.log('[DEBUG] ViewBox:', vbWidth, 'x', vbHeight, 'MainContainer:', containerWidth, 'x', containerHeight);
+    
+    // What portion of the viewBox is visible depends on:
+    // 1. The zoom level (scale) - when zoomed in 2x, we see half as much
+    // 2. The container's aspect ratio
+    
+    // Visible area in graph coordinates (viewBox space)
+    // At scale=1, we should see roughly the entire graph (or what fits the aspect ratio)
+    // At scale=2, we see half as much
+    
+    // The aspect ratio of what we can see
+    const visibleAspect = containerWidth / containerHeight;
+    const graphAspect = vbWidth / vbHeight;
+    
+    let visibleWidth, visibleHeight;
+    
+    if (visibleAspect > graphAspect) {
+        // Container is wider than graph - constrain to graph height
+        visibleHeight = vbHeight / vizState.mainScale;
+        visibleWidth = visibleHeight * visibleAspect;
+    } else {
+        // Container is narrower than graph - constrain to graph width  
+        visibleWidth = vbWidth / vizState.mainScale;
+        visibleHeight = visibleWidth / visibleAspect;
+    }
+    
+    // Position based on pan translation (converted to graph coordinates)
+    // When translate is positive (moved right), the visible area starts further left
+    const visibleX = -vizState.mainTranslate.x / vizState.mainScale;
+    const visibleY = -vizState.mainTranslate.y / vizState.mainScale;
+    
+    console.log('[DEBUG] Bird rect update - x=' + Math.round(visibleX) + ', y=' + Math.round(visibleY) + 
+        ', w=' + Math.round(visibleWidth) + ', h=' + Math.round(visibleHeight) +
+        ' scale=' + vizState.mainScale.toFixed(2) +
+        ' translate=(' + Math.round(vizState.mainTranslate.x) + ',' + Math.round(vizState.mainTranslate.y) + ')' +
+        ' containerAspect=' + visibleAspect.toFixed(2) + ' graphAspect=' + graphAspect.toFixed(2));
+    
+    rect.setAttribute('x', visibleX);
+    rect.setAttribute('y', visibleY);
+    rect.setAttribute('width', visibleWidth);
+    rect.setAttribute('height', visibleHeight);
+}
+
 

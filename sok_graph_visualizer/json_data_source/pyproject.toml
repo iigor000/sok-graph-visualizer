@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.entry-points."graph.data_source"]
-json_datasource = "json_data_source.src.implementation:JsonDataSourcePlugin"
+json_datasource = "sok_graph_visualizer.json_data_source.src.implementation:JsonDataSourcePlugin"
 
 [tool.setuptools.packages.find]
 where = ["."]

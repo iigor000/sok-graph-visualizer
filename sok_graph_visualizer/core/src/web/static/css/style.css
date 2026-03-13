@@ -311,7 +311,7 @@ body {
     color: var(--dark-color);
 }
 
-.tree-view-content, .bird-view-content {
+.tree-view-content {
     flex: 1;
     overflow-y: auto;
     padding: 10px;
@@ -322,6 +322,32 @@ body {
     justify-content: center;
 }
 
+.bird-view-content {
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #fafafa;
+}
+
+.bird-view-content svg {
+    width: 100%;
+    height: 100%;
+}
+
+.bird-view-rect {
+    fill: none;
+    stroke: #ff6b6b;
+    stroke-width: 4;
+    pointer-events: auto;
+    cursor: move;
+}
+
 /* Right panel - Main view and Filters */
 .right-panel {
     flex: 1;
@@ -330,7 +356,7 @@ body {
     gap: 10px;
 }
 
-.main-view, .filters-panel {
+.main-view, .filters-panel, .visualizer-panel {
     background-color: white;
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -342,13 +368,75 @@ body {
 
 .main-view {
     flex: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-view-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background-color: var(--light-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.main-view-header h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zoom-btn {
+    padding: 4px 8px;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color);
+    transition: all 0.2s;
+}
+
+.zoom-btn:hover {
+    background-color: var(--hover-bg);
+    border-color: #b0b0b0;
+}
+
+.zoom-btn:active {
+    transform: scale(0.95);
+}
+
+.zoom-level {
+    font-size: 12px;
+    color: var(--text-color);
+    min-width: 50px;
+    text-align: center;
+}
+
+.bottom-panels {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+}
+
+.visualizer-panel {
+    flex: 0.3;
 }
 
 .filters-panel {
     flex: 1;
 }
 
-.main-view h3, .filters-panel h3 {
+.main-view h3, .filters-panel h3, .visualizer-panel h3 {
     padding: 12px;
     background-color: var(--light-color);
     border-bottom: 1px solid var(--border-color);
@@ -357,12 +445,40 @@ body {
     color: var(--dark-color);
 }
 
-.main-view-content, .filters-content {
+.main-view-content, .filters-content, .visualizer-content {
     flex: 1;
     overflow: auto;
     padding: 15px;
     font-size: 12px;
     color: #666;
+}
+
+.main-view-content {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #fafafa;
+    overflow: hidden;
+}
+
+.main-view-content #main {
+    width: 100%;
+    height: 100%;
+}
+
+.main-view-content svg {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+.main-view-content svg:active {
+    cursor: grabbing;
+}
+
+.filters-content, .visualizer-content {
     display: flex;
     align-items: center;
     justify-content: center;

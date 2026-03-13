@@ -15,6 +15,9 @@ dependencies = [
     "Jinja2>=3.0",
 ]
 
+[project.entry-points."graph.data_visualizer"]
+simple_visualizer = "sok_graph_visualizer.simple_visualizer.src.simple_visualizer:SimpleVisualizer"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["*"]
