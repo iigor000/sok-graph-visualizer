@@ -17,7 +17,6 @@ try:
     # Initialize core application
     core_app = App()
     workspace_manager = core_app.workspace_manager
-    render_service = core_app.render_service
     plugin_manager = core_app.plugin_manager
 
     services_loaded = True
@@ -27,7 +26,6 @@ except Exception as e:
     traceback.print_exc()
     core_app = None
     workspace_manager = None
-    render_service = None
     plugin_manager = None
     services_loaded = False
 
@@ -129,7 +127,21 @@ def render_graph():
         return jsonify({'error': 'Core services not loaded', 'success': False}), 500
     
     try:
-        html = render_service.render_active_workspace()
+        # Get active workspace
+        if workspace_manager.active_workspace_id is None:
+            return jsonify({'error': 'No active workspace', 'success': False}), 400
+        
+        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
+        if workspace is None:
+            return jsonify({'error': 'Active workspace not found', 'success': False}), 400
+        
+        # Get visualizer plugin from workspace
+        visualizer = workspace.visualizer_plugin
+        if visualizer is None:
+            return jsonify({'error': 'No visualizer plugin selected', 'success': False}), 400
+        
+        # Render using the visualizer plugin directly
+        html = visualizer.render(workspace.current_graph)
         return jsonify({'html': html, 'success': True})
     except Exception as e:
         return jsonify({'error': str(e), 'success': False}), 500

@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.entry-points."graph.data_source"]
-rdf_datasource = "rdf_datasource.src.implementation:RDFDataSourcePlugin"
+rdf_datasource = "sok_graph_visualizer.rdf_datasource.src.implementation:RDFDataSourcePlugin"
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -11,6 +11,8 @@
 <body>
     {% block content %}{% endblock %}
     
+    <!-- Load D3.js globally for visualizer plugins -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="{{ 'js/main.js'|static }}"></script>
     {% block extra_js %}{% endblock %}
 </body>

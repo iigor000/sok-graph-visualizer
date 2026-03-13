@@ -4,8 +4,8 @@ from typing import Dict
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from api.service.DataVisualizerService import VisualizerPlugin
-from api.model.Graph import Graph
+from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
+from sok_graph_visualizer.api.model.Graph import Graph
 
 
 # DTO objects for template

@@ -15,7 +15,7 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.entry-points."graph.data_source"]
-xml_datasource = "xml_datasource.src.service:XmlDataSourceService"
+xml_datasource = "sok_graph_visualizer.xml_datasource.src.service:XmlDataSourceService"
 
 [tool.setuptools.packages.find]
 where = ["."]

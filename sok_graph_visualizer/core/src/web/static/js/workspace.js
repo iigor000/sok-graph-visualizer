@@ -22,17 +22,49 @@ function clearFeedback() {
 }
 
 function getJsonHeaders() {
-    return {
+    const headers = {
         'Content-Type': 'application/json'
     };
+    
+    // Get CSRF token from cookie
+    const csrfToken = getCookie('csrftoken');
+    if (csrfToken) {
+        headers['X-CSRFToken'] = csrfToken;
+    }
+    
+    return headers;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
 async function fetchDataSourcePlugins() {
     const response = await fetch('/api/plugins/data-sources');
+    
     if (!response.ok) {
         throw new Error('Failed to load data source plugins');
     }
-    return response.json();
+    
+    const text = await response.text();
+    
+    try {
+        const json = JSON.parse(text);
+        return json;
+    } catch (parseError) {
+        throw parseError;
+    }
 }
 
 function renderConfigFields(selectedPlugin) {
@@ -138,18 +170,23 @@ async function refreshWorkspaces() {
 }
 
 async function createWorkspace(payload) {
-    const response = await fetch('/api/workspaces', {
+    const response = await fetch('/api/workspaces/', {
         method: 'POST',
         headers: getJsonHeaders(),
         body: JSON.stringify(payload)
     });
 
-    const body = await response.json();
-    if (!response.ok) {
-        throw new Error(body.error || 'Failed to create workspace');
+    const text = await response.text();
+    
+    try {
+        const body = JSON.parse(text);
+        if (!response.ok) {
+            throw new Error(body.error || 'Failed to create workspace');
+        }
+        return body;
+    } catch (parseError) {
+        throw new Error('Failed to create workspace - invalid response: ' + parseError.message);
     }
-
-    return body;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -168,6 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         clearFeedback();
         const pluginResponse = await fetchDataSourcePlugins();
+        
         plugins = pluginResponse.plugins || [];
 
         plugins.forEach((plugin) => {

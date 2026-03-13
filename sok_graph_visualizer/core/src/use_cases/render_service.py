@@ -20,17 +20,7 @@ class RenderService:
     def __init__(self, workspace_manager: WorkspaceManager, visualizer: Optional[VisualizerPlugin] = None):
         self.workspace_manager = workspace_manager
         self.visualizer: Optional[VisualizerPlugin] = visualizer
-        self._hooks: Dict[str, List[Callable[..., Any]]] = {}
 
-    def set_visualizer(self, visualizer: VisualizerPlugin):
-        self.visualizer = visualizer
-
-    def register_hook(self, event: str, fn: Callable[..., Any]):
-        self._hooks.setdefault(event, []).append(fn)
-
-    def _emit(self, event: str, **kwargs):
-        for fn in self._hooks.get(event, []):
-            fn(**kwargs)
 
     def render_active_workspace(self) -> str:
         """
@@ -51,14 +41,8 @@ class RenderService:
 
         graph: Graph = workspace.current_graph
 
-        # hook before render
-        self._emit("pre_render", graph=graph, workspace=workspace)
-
         # pass Graph model directly; visualizer is responsible for data-node-id in HTML
         result = visualizer.render(graph)
-
-        # hook after render
-        self._emit("post_render", graph=graph, workspace=workspace, result=result)
 
         return result
 

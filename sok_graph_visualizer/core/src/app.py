@@ -21,8 +21,6 @@ from sok_graph_visualizer.core.src.use_cases.plugin_recognition import PluginMan
 from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
-from sok_graph_visualizer.core.src.use_cases.render_service import RenderService
-
 
 
 class App():
@@ -37,7 +35,6 @@ class App():
         Initialize workspace manager, command processor and plugins.
         """
         self.workspace_manager = WorkspaceManager()
-        self.render_service = RenderService(self.workspace_manager)
         self.visualizer : VisualizerPlugin = None
         self.data_source_plugin : DataSourcePlugin = None
         self.plugin_manager = PluginManager()
@@ -146,14 +143,3 @@ class App():
             CommandNames.REFRESH_DATA_SOURCE,
             lambda args: RefreshDataSourceCommand(self.workspace_manager, args)
         )
-
-    def render_graph(self):
-        """
-        Render the graph of the active workspace using the render service.
-        """
-        active_workspace = self.workspace_manager.get_active_workspace()
-        if active_workspace is None:
-            raise RuntimeError("No active workspace")
-        if active_workspace.visualizer_plugin is None and self.render_service.visualizer is None:
-            raise RuntimeError("No visualizer plugin selected")
-        return self.render_service.render_active_workspace()
