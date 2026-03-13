@@ -1,4 +1,6 @@
 
+from typing import Dict, Any, Tuple
+
 from sok_graph_visualizer.core.src.commands.command_names import CommandNames
 from sok_graph_visualizer.core.src.commands.command_processor import CommandProcessor
 from sok_graph_visualizer.core.src.commands.filter_command import FilterCommand
@@ -18,6 +20,8 @@ from sok_graph_visualizer.core.src.commands.workspace_commands import SelectWork
 from sok_graph_visualizer.core.src.commands.workspace_commands import UpdateWorkspaceCommand
 from sok_graph_visualizer.core.src.graph_query.graph_query_service import GraphQueryService
 from sok_graph_visualizer.core.src.use_cases.plugin_recognition import PluginManager
+from sok_graph_visualizer.core.src.use_cases.workspace_service import WorkspaceService
+from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
 from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
@@ -32,13 +36,28 @@ class App():
 
     def __init__(self):
         """
-        Initialize workspace manager, command processor and plugins.
+        Initialize workspace service, context, command processor and plugins.
         """
-        self.workspace_manager = WorkspaceManager()
+        self.workspace_service = WorkspaceService()
+        self.workspace_context = WorkspaceContext(self.workspace_service)
         self.visualizer : VisualizerPlugin = None
         self.data_source_plugin : DataSourcePlugin = None
         self.plugin_manager = PluginManager()
         self.plugin_manager.load_plugins()
+        
+        # Manually register JSON and XML data sources
+        try:
+            from sok_graph_visualizer.json_data_source.src.implementation import JsonDataSourcePlugin
+            self.plugin_manager._data_sources['json'] = JsonDataSourcePlugin
+        except Exception as e:
+            print(f"Warning: Could not register JSON plugin: {e}")
+        
+        try:
+            from sok_graph_visualizer.xml_datasource.src.service import XmlDataSourceService
+            self.plugin_manager._data_sources['xml'] = XmlDataSourceService
+        except Exception as e:
+            print(f"Warning: Could not register XML plugin: {e}")
+        
         self.command_processor = CommandProcessor()
         self.graph_query_service = GraphQueryService()
 
@@ -51,7 +70,7 @@ class App():
         self.command_processor.register_command(
             CommandNames.FILTER,
             lambda args: FilterCommand(
-                workspace_manager=self.workspace_manager,
+                workspace_context=self.workspace_context,
                 graph_query_service=self.graph_query_service,
                 args=args
             )
@@ -60,7 +79,7 @@ class App():
         self.command_processor.register_command(
             CommandNames.SEARCH,
             lambda args: SearchCommand(
-                workspace_manager=self.workspace_manager,
+                workspace_context=self.workspace_context,
                 graph_query_service=self.graph_query_service,
                 args=args
             )
@@ -69,77 +88,107 @@ class App():
         # CREATE NODE
         self.command_processor.register_command(
             CommandNames.CREATE_NODE,
-            lambda args: CreateNodeCommand(self.workspace_manager, args)
+            lambda args: CreateNodeCommand(self.workspace_context, args)
         )
 
         # EDIT NODE
         self.command_processor.register_command(
             CommandNames.EDIT_NODE,
-            lambda args: EditNodeCommand(self.workspace_manager, args)
+            lambda args: EditNodeCommand(self.workspace_context, args)
         )
 
         # DELETE NODE
         self.command_processor.register_command(
             CommandNames.DELETE_NODE,
-            lambda args: DeleteNodeCommand(self.workspace_manager, args)
+            lambda args: DeleteNodeCommand(self.workspace_context, args)
         )
 
         # CREATE EDGE
         self.command_processor.register_command(
             CommandNames.CREATE_EDGE,
-            lambda args: CreateEdgeCommand(self.workspace_manager, args)
+            lambda args: CreateEdgeCommand(self.workspace_context, args)
         )
 
         # EDIT EDGE
         self.command_processor.register_command(
             CommandNames.EDIT_EDGE,
-            lambda args: EditEdgeCommand(self.workspace_manager, args)
+            lambda args: EditEdgeCommand(self.workspace_context, args)
         )
 
         # DELETE EDGE
         self.command_processor.register_command(
             CommandNames.DELETE_EDGE,
-            lambda args: DeleteEdgeCommand(self.workspace_manager, args)
+            lambda args: DeleteEdgeCommand(self.workspace_context, args)
         )
 
         # CLEAR GRAPH
         self.command_processor.register_command(
             CommandNames.CLEAR_GRAPH,
-            lambda args: ClearGraphCommand(self.workspace_manager, args)
+            lambda args: ClearGraphCommand(self.workspace_context, args)
         )
 
         # SELECT WORKSPACE
         self.command_processor.register_command(
             CommandNames.SELECT_WORKSPACE,
-            lambda args: SelectWorkspaceCommand(self.workspace_manager, args)
+            lambda args: SelectWorkspaceCommand(self.workspace_service, self.workspace_context, args)
         )
 
         # CREATE WORKSPACE
         self.command_processor.register_command(
             CommandNames.CREATE_WORKSPACE,
-            lambda args: CreateWorkspaceCommand(self.workspace_manager, self.plugin_manager, args)
+            lambda args: CreateWorkspaceCommand(self.workspace_service, self.workspace_context, self.plugin_manager, args)
         )
 
         # UPDATE WORKSPACE
         self.command_processor.register_command(
             CommandNames.UPDATE_WORKSPACE,
-            lambda args: UpdateWorkspaceCommand(self.workspace_manager, self.plugin_manager, args)
+            lambda args: UpdateWorkspaceCommand(self.workspace_service, self.workspace_context, self.plugin_manager, args)
         )
 
         # DELETE WORKSPACE
         self.command_processor.register_command(
             CommandNames.DELETE_WORKSPACE,
-            lambda args: DeleteWorkspaceCommand(self.workspace_manager, args)
+            lambda args: DeleteWorkspaceCommand(self.workspace_service, self.workspace_context, args)
         )
 
         # SELECT VISUALIZER
         self.command_processor.register_command(
             CommandNames.SELECT_VISUALIZER,
-            lambda args: SelectVisualizerCommand(self.workspace_manager, self.plugin_manager, args)
+            lambda args: SelectVisualizerCommand(self.workspace_service, self.workspace_context, self.plugin_manager, args)
         )
 
         # REFRESH DATA SOURCE
         self.command_processor.register_command(
             CommandNames.REFRESH_DATA_SOURCE,
-            lambda args: RefreshDataSourceCommand(self.workspace_manager, args)
+            lambda args: RefreshDataSourceCommand(self.workspace_service, self.workspace_context, args)
         )
+
+    def execute_command(self, command_name: str, args: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        Execute a command through the command processor.
+        This is the public API for all command execution.
+        
+        Args:
+            command_name: Name of the command to execute
+            args: Arguments for the command
+            
+        Returns:
+            Tuple of (success: bool, message: str)
+        """
+        return self.command_processor.execute_command(command_name, args)
+
+    def get_active_workspace(self):
+        """Get the currently active workspace."""
+        return self.workspace_context.get_active_workspace()
+
+    def get_workspace(self, workspace_id: str):
+        """Get a workspace by ID."""
+        return self.workspace_service.get_workspace(workspace_id)
+
+    def list_workspaces(self):
+        """Get a list of all workspaces."""
+        return self.workspace_service.get_workspaces()
+
+    def get_workspace_context(self) -> WorkspaceContext:
+        """Get the workspace context."""
+        return self.workspace_context

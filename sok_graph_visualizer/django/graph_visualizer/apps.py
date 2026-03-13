@@ -7,8 +7,7 @@ class GraphExplorerConfig(AppConfig):
     Django AppConfig for the Graph Explorer application.
 
     This class initializes the core application (`App`) when Django starts
-    and exposes its main services (workspace manager, command processor, etc.) 
-    to Django views.
+    and exposes its main services to Django views.
     """
 
     default_auto_field = "django.db.models.BigAutoField"
@@ -19,16 +18,12 @@ class GraphExplorerConfig(AppConfig):
         Called once when Django starts.
 
         Here we create the core application instance which initializes:
-        - WorkspaceManager
+        - WorkspaceService
+        - WorkspaceContext
         - CommandProcessor
         - registered commands
         """
         self.core_app = App()
-
-    @property
-    def workspace_manager(self):
-        """Return the WorkspaceManager instance."""
-        return self.core_app.workspace_manager
 
     @property
     def command_processor(self):
@@ -44,3 +39,19 @@ class GraphExplorerConfig(AppConfig):
     def plugin_manager(self):
         """Return the PluginManager instance."""
         return self.core_app.plugin_manager
+
+    def execute_command(self, command_name: str, args: dict):
+        """Execute a command through the command processor."""
+        return self.core_app.execute_command(command_name, args)
+
+    def get_active_workspace(self):
+        """Get the currently active workspace."""
+        return self.core_app.get_active_workspace()
+
+    def get_workspace(self, workspace_id: str):
+        """Get a workspace by ID."""
+        return self.core_app.get_workspace(workspace_id)
+
+    def list_workspaces(self):
+        """Get a list of all workspaces."""
+        return self.core_app.list_workspaces()

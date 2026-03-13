@@ -1,7 +1,7 @@
 from typing import Any, Dict, Tuple
 from sok_graph_visualizer.api.model.Edge import Edge
 from sok_graph_visualizer.core.src.commands.command import Command
-from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
+from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
 from sok_graph_visualizer.api.model.Node import Node
 
 class EditEdgeCommand(Command):
@@ -15,22 +15,22 @@ class EditEdgeCommand(Command):
     not included remain unchanged.
 
     Attributes:
-        workspace_manager (WorkspaceManager): Manager to access the active workspace.
+        workspace_context (WorkspaceContext): Context to access the active workspace.
         args (Dict[str, Any]): Dictionary containing command parameters:
             - id (str): Identifier of the edge to edit.
             - properties (Dict[str, Any], optional): Key-value pairs of attributes 
               to update on the edge.
     """
 
-    def __init__(self, workspace_manager: WorkspaceManager, args: Dict[str, Any]):
+    def __init__(self, workspace_context: WorkspaceContext, args: Dict[str, Any]):
         """
         Initialize the EditEdgeCommand.
 
         Args:
-            workspace_manager (WorkspaceManager): Manager used to retrieve the active workspace.
+            workspace_context (WorkspaceContext): Context used to retrieve the active workspace.
             args (Dict[str, Any]): Dictionary containing the edge ID and optional properties to update.
         """
-        self.workspace_manager = workspace_manager
+        self.workspace_context = workspace_context
         self.args = args
 
     def execute(self) -> Tuple[bool, str]:
@@ -52,7 +52,7 @@ class EditEdgeCommand(Command):
                 - success (bool): True if the edge was updated successfully, False otherwise.
                 - message (str): Human-readable description of the result.
         """
-        workspace = self.workspace_manager.get_active_workspace()
+        workspace = self.workspace_context.get_active_workspace()
 
         if workspace is None:
             return False, "No active workspace"

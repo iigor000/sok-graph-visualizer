@@ -4,6 +4,7 @@ Flask application for SOK Graph Visualizer
 from flask import Flask, render_template, session, redirect, url_for, jsonify, request
 from pathlib import Path
 import sys
+import json
 from jinja2 import nodes
 from jinja2.ext import Extension
 
@@ -14,10 +15,7 @@ try:
     from sok_graph_visualizer.api.model.Graph import Graph
     from sok_graph_visualizer.core.src.app import App
 
-    # Initialize core application
     core_app = App()
-    workspace_manager = core_app.workspace_manager
-    plugin_manager = core_app.plugin_manager
 
     services_loaded = True
 except Exception as e:
@@ -25,8 +23,6 @@ except Exception as e:
     print(f"Warning: Could not load core services: {e}")
     traceback.print_exc()
     core_app = None
-    workspace_manager = None
-    plugin_manager = None
     services_loaded = False
 
 
@@ -66,7 +62,7 @@ def static_filter(path):
 
 
 def _serialize_workspace(workspace):
-    active_workspace = workspace_manager.get_active_workspace() if workspace_manager else None
+    active_workspace = core_app.get_active_workspace() if core_app else None
     return {
         'id': workspace.workspace_id,
         'name': workspace.name,
@@ -82,9 +78,9 @@ def index():
 
     session_workspace_id = session.get('active_workspace_id')
     if session_workspace_id:
-        workspace_manager.set_active_workspace(str(session_workspace_id))
+        core_app.execute_command('select_workspace', {'workspace_id': str(session_workspace_id)})
 
-    workspaces = [_serialize_workspace(ws) for ws in workspace_manager.list_workspaces()]
+    workspaces = [_serialize_workspace(ws) for ws in core_app.list_workspaces()]
     return render_template('index.html', title='SOK Graph Visualizer', workspaces=workspaces, services_loaded=True)
 
 
@@ -97,8 +93,10 @@ def workspace_page():
 @app.route('/workspace/<workspace_id>')
 def load_workspace(workspace_id: str):
     """Load workspace by ID (redirects to index)"""
-    if services_loaded and workspace_manager.set_active_workspace(str(workspace_id)):
-        session['active_workspace_id'] = str(workspace_id)
+    if services_loaded:
+        success, message = core_app.execute_command('select_workspace', {'workspace_id': str(workspace_id)})
+        if success:
+            session['active_workspace_id'] = str(workspace_id)
     return redirect(url_for('workspace_page'))
 
 
@@ -108,11 +106,12 @@ def activate_workspace(workspace_id: str):
     if not services_loaded:
         return jsonify({'success': False, 'error': 'Core services not loaded'}), 500
 
-    if not workspace_manager.set_active_workspace(str(workspace_id)):
+    success, message = core_app.execute_command('select_workspace', {'workspace_id': str(workspace_id)})
+    if not success:
         return jsonify({'success': False, 'error': f'Workspace not found: {workspace_id}'}), 404
 
     session['active_workspace_id'] = str(workspace_id)
-    workspace = workspace_manager.get_active_workspace()
+    workspace = core_app.get_active_workspace()
     return jsonify({
         'success': True,
         'workspace': _serialize_workspace(workspace),
@@ -128,12 +127,9 @@ def render_graph():
     
     try:
         # Get active workspace
-        if workspace_manager.active_workspace_id is None:
-            return jsonify({'error': 'No active workspace', 'success': False}), 400
-        
-        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
+        workspace = core_app.get_active_workspace()
         if workspace is None:
-            return jsonify({'error': 'Active workspace not found', 'success': False}), 400
+            return jsonify({'error': 'No active workspace', 'success': False}), 400
         
         # Get visualizer plugin from workspace
         visualizer = workspace.visualizer_plugin
@@ -156,7 +152,7 @@ def list_workspaces():
         return jsonify({'error': 'Core services not loaded'}), 500
 
     try:
-        workspaces = [_serialize_workspace(ws) for ws in workspace_manager.list_workspaces()]
+        workspaces = [_serialize_workspace(ws) for ws in core_app.list_workspaces()]
         return jsonify(workspaces)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -179,14 +175,16 @@ def create_workspace():
         return jsonify({'success': False, 'error': "Missing 'data_source_id'"}), 400
 
     try:
-        data_source_plugin = plugin_manager.instantiate_data_source(data_source_id, config=config)
-        graph = data_source_plugin.parse()
-        workspace = workspace_manager.create_workspace(
-            base_graph=graph,
-            name=name,
-            data_source_plugin=data_source_plugin,
-            set_active=True
-        )
+        success, message = core_app.execute_command('create_workspace', {
+            'name': name,
+            'data_source_id': data_source_id,
+            'config': config
+        })
+        
+        if not success:
+            return jsonify({'success': False, 'error': message}), 400
+
+        workspace = core_app.get_active_workspace()
         session['active_workspace_id'] = workspace.workspace_id
 
         return jsonify({
@@ -206,7 +204,7 @@ def list_data_source_plugins():
 
     try:
         plugins = []
-        for plugin_id, plugin_class in plugin_manager.get_data_source_plugins().items():
+        for plugin_id, plugin_class in core_app.plugin_manager.get_data_source_plugins().items():
             plugin_instance = plugin_class(config={})
             required_config = plugin_instance.get_required_config()
             plugins.append({
@@ -229,7 +227,7 @@ def get_workspace(workspace_id):
         return jsonify({'error': 'Core services not loaded'}), 500
 
     try:
-        workspace = workspace_manager.get_workspace(str(workspace_id))
+        workspace = core_app.get_workspace(str(workspace_id))
         if workspace is None:
             return jsonify({'error': f'Workspace not found: {workspace_id}'}), 404
 
@@ -241,6 +239,32 @@ def get_workspace(workspace_id):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/workspace/<workspace_id>', methods=['DELETE'])
+def delete_workspace(workspace_id):
+    """Delete a workspace by ID"""
+    if not services_loaded:
+        return jsonify({'success': False, 'error': 'Core services not loaded'}), 500
+
+    try:
+        success, message = core_app.execute_command('delete_workspace', {
+            'workspace_id': str(workspace_id)
+        })
+        
+        if not success:
+            return jsonify({'success': False, 'error': message}), 400
+
+        # Clear session if deleted workspace was active
+        if session.get('active_workspace_id') == str(workspace_id):
+            session.pop('active_workspace_id', None)
+
+        return jsonify({
+            'success': True,
+            'message': message
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Failed to delete workspace: {str(e)}'}), 400
 
 
 @app.route('/health')

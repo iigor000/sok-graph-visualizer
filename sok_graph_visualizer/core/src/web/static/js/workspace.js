@@ -111,6 +111,24 @@ function closeModal() {
     configFields.innerHTML = '';
 }
 
+function openDeleteModal(workspaceId, workspaceName) {
+    const modal = document.getElementById('delete-workspace-modal');
+    const nameElement = document.getElementById('delete-workspace-name');
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+    
+    nameElement.textContent = workspaceName;
+    confirmBtn.dataset.workspaceId = workspaceId;
+    modal.hidden = false;
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('delete-workspace-modal');
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+    
+    modal.hidden = true;
+    confirmBtn.dataset.workspaceId = '';
+}
+
 async function activateWorkspace(workspaceId) {
     const response = await fetch(`/api/workspace/${workspaceId}/activate`, {
         method: 'POST',
@@ -133,9 +151,33 @@ function renderWorkspaceList(workspaces) {
         const item = document.createElement('div');
         item.className = `workspace-item ${workspace.active ? 'active' : ''}`;
         item.dataset.workspaceId = workspace.id;
-        item.textContent = workspace.name;
+        
+        // Create container for name and delete button
+        const itemContent = document.createElement('div');
+        itemContent.className = 'workspace-item-content';
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'workspace-item-name';
+        nameSpan.textContent = workspace.name;
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'workspace-item-delete';
+        deleteBtn.type = 'button';
+        deleteBtn.title = 'Delete workspace';
+        deleteBtn.textContent = '×';
+        deleteBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            openDeleteModal(workspace.id, workspace.name);
+        });
+        
+        itemContent.appendChild(nameSpan);
+        itemContent.appendChild(deleteBtn);
+        item.appendChild(itemContent);
 
-        item.addEventListener('click', async () => {
+        item.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('workspace-item-delete')) {
+                return;
+            }
             try {
                 clearFeedback();
                 await activateWorkspace(workspace.id);
@@ -189,12 +231,46 @@ async function createWorkspace(payload) {
     }
 }
 
+async function deleteWorkspace(workspaceId) {
+    const response = await fetch(`/api/workspace/${workspaceId}`, {
+        method: 'DELETE',
+        headers: getJsonHeaders()
+    });
+
+    const text = await response.text();
+    
+    // Check if response is valid JSON
+    let body;
+    try {
+        body = JSON.parse(text);
+    } catch (parseError) {
+        // If not JSON, try to extract error from response
+        if (!response.ok) {
+            // Server returned error but not in JSON format
+            if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                throw new Error('Server error: ' + (response.statusText || 'Unknown error'));
+            }
+            throw new Error('Invalid response from server: ' + text.substring(0, 100));
+        }
+        throw new Error('Failed to parse server response');
+    }
+
+    if (!response.ok) {
+        throw new Error(body.error || body.message || 'Failed to delete workspace');
+    }
+
+    return body;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const openModalButton = document.getElementById('open-create-workspace-modal');
     const modal = document.getElementById('create-workspace-modal');
+    const deleteModal = document.getElementById('delete-workspace-modal');
     const closeElements = document.querySelectorAll('[data-close-modal="true"]');
+    const closeDeleteElements = document.querySelectorAll('[data-close-delete-modal="true"]');
     const form = document.getElementById('create-workspace-form');
     const dataSourceSelect = document.getElementById('data-source-select');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
     if (!openModalButton || !modal || !form || !dataSourceSelect) {
         return;
@@ -225,6 +301,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     closeElements.forEach((element) => {
         element.addEventListener('click', closeModal);
+    });
+
+    closeDeleteElements.forEach((element) => {
+        element.addEventListener('click', closeDeleteModal);
+    });
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+        const workspaceId = confirmDeleteBtn.dataset.workspaceId;
+        if (!workspaceId) {
+            return;
+        }
+
+        try {
+            clearFeedback();
+            const workspaceName = document.getElementById('delete-workspace-name').textContent;
+            await deleteWorkspace(workspaceId);
+            closeDeleteModal();
+            await refreshWorkspaces();
+            showFeedback(`Workspace "${workspaceName}" deleted successfully`, false);
+        } catch (error) {
+            showFeedback(error.message, true);
+        }
     });
 
     dataSourceSelect.addEventListener('change', () => {

@@ -1,13 +1,15 @@
 from copy import deepcopy
 from typing import Any, Dict, Optional, Tuple
+import json
 
 from sok_graph_visualizer.api.model.Graph import Graph
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 from sok_graph_visualizer.core.src.commands.command import Command
 from sok_graph_visualizer.core.src.use_cases.plugin_recognition import PluginManager
+from sok_graph_visualizer.core.src.use_cases.workspace_service import WorkspaceService
+from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
 from sok_graph_visualizer.core.src.workspace.workspace import Workspace
-from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
 
 
 def _replace_workspace_graph(workspace: Workspace, graph: Graph) -> None:
@@ -16,8 +18,9 @@ def _replace_workspace_graph(workspace: Workspace, graph: Graph) -> None:
 
 
 class SelectWorkspaceCommand(Command):
-    def __init__(self, workspace_manager: WorkspaceManager, args: Dict[str, Any]):
-        self.workspace_manager = workspace_manager
+    def __init__(self, workspace_service: WorkspaceService, workspace_context: WorkspaceContext, args: Dict[str, Any]):
+        self.workspace_service = workspace_service
+        self.workspace_context = workspace_context
         workspace_id = args.get("workspace_id")
         self.workspace_id = str(workspace_id) if workspace_id is not None else None
 
@@ -25,16 +28,18 @@ class SelectWorkspaceCommand(Command):
         if not self.workspace_id:
             return False, "Missing 'workspace_id'"
 
-        if not self.workspace_manager.set_active_workspace(self.workspace_id):
+        workspace = self.workspace_service.get_workspace(self.workspace_id)
+        if workspace is None:
             return False, f"Workspace not found: {self.workspace_id}"
 
-        workspace = self.workspace_manager.get_active_workspace()
+        self.workspace_context.select_workspace(self.workspace_id)
         return True, f"Selected workspace {workspace.name}"
 
 
 class CreateWorkspaceCommand(Command):
-    def __init__(self, workspace_manager: WorkspaceManager, plugin_manager: PluginManager, args: Dict[str, Any]):
-        self.workspace_manager = workspace_manager
+    def __init__(self, workspace_service: WorkspaceService, workspace_context: WorkspaceContext, plugin_manager: PluginManager, args: Dict[str, Any]):
+        self.workspace_service = workspace_service
+        self.workspace_context = workspace_context
         self.plugin_manager = plugin_manager
         self.workspace_id = args.get("workspace_id")
         self.name = args.get("name")
@@ -57,13 +62,14 @@ class CreateWorkspaceCommand(Command):
             base_graph = data_source_plugin.parse()
             visualizer_plugin = self._instantiate_visualizer()
 
-            workspace = self.workspace_manager.create_workspace(
+            workspace = self.workspace_service.create_workspace(
+                name=self.name,
                 base_graph=base_graph,
                 workspace_id=str(self.workspace_id) if self.workspace_id is not None else None,
-                name=self.name,
                 data_source_plugin=data_source_plugin,
                 visualizer_plugin=visualizer_plugin,
             )
+            self.workspace_context.select_workspace(workspace.workspace_id)
             return True, f"Created workspace {workspace.name}"
         except ValueError as error:
             return False, str(error)
@@ -80,8 +86,9 @@ class CreateWorkspaceCommand(Command):
 
 
 class UpdateWorkspaceCommand(Command):
-    def __init__(self, workspace_manager: WorkspaceManager, plugin_manager: PluginManager, args: Dict[str, Any]):
-        self.workspace_manager = workspace_manager
+    def __init__(self, workspace_service: WorkspaceService, workspace_context: WorkspaceContext, plugin_manager: PluginManager, args: Dict[str, Any]):
+        self.workspace_service = workspace_service
+        self.workspace_context = workspace_context
         self.plugin_manager = plugin_manager
         workspace_id = args.get("workspace_id")
         self.workspace_id = str(workspace_id) if workspace_id is not None else None
@@ -99,7 +106,7 @@ class UpdateWorkspaceCommand(Command):
         if not self.data_source_id:
             return False, "Missing 'data_source_id'"
 
-        workspace = self.workspace_manager.get_workspace(self.workspace_id)
+        workspace = self.workspace_service.get_workspace(self.workspace_id)
         if workspace is None:
             return False, f"Workspace not found: {self.workspace_id}"
 
@@ -115,7 +122,7 @@ class UpdateWorkspaceCommand(Command):
             workspace.set_data_source_plugin(data_source_plugin)
             workspace.set_visualizer_plugin(visualizer_plugin)
             _replace_workspace_graph(workspace, graph)
-            self.workspace_manager.set_active_workspace(self.workspace_id)
+            self.workspace_context.select_workspace(self.workspace_id)
 
             return True, f"Updated workspace {workspace.name}"
         except ValueError as error:
@@ -133,8 +140,9 @@ class UpdateWorkspaceCommand(Command):
 
 
 class DeleteWorkspaceCommand(Command):
-    def __init__(self, workspace_manager: WorkspaceManager, args: Dict[str, Any]) -> None:
-        self.workspace_manager = workspace_manager
+    def __init__(self, workspace_service: WorkspaceService, workspace_context: WorkspaceContext, args: Dict[str, Any]) -> None:
+        self.workspace_service = workspace_service
+        self.workspace_context = workspace_context
         workspace_id = args.get("workspace_id")
         self.workspace_id = str(workspace_id) if workspace_id is not None else None
 
@@ -142,22 +150,27 @@ class DeleteWorkspaceCommand(Command):
         if not self.workspace_id:
             return False, "Missing 'workspace_id'"
 
-        if self.workspace_manager.get_workspace(self.workspace_id) is None:
+        if self.workspace_service.get_workspace(self.workspace_id) is None:
             return False, f"Workspace not found: {self.workspace_id}"
 
-        if len(self.workspace_manager.workspaces) <= 1:
+        if len(self.workspace_service.get_workspaces()) <= 1:
             return False, "There must be at least one workspace"
 
         try:
-            self.workspace_manager.delete_workspace(self.workspace_id)
+            self.workspace_service.remove_workspace(self.workspace_id)
+            # Select first workspace as active if current one is deleted
+            remaining = self.workspace_service.get_workspaces()
+            if remaining:
+                self.workspace_context.select_workspace(remaining[0].workspace_id)
             return True, "Successfully removed the workspace"
         except Exception as error:
             return False, f"Failed to delete workspace: {str(error)}"
 
 
 class SelectVisualizerCommand(Command):
-    def __init__(self, workspace_manager: WorkspaceManager, plugin_manager: PluginManager, args: Dict[str, Any]) -> None:
-        self.workspace_manager = workspace_manager
+    def __init__(self, workspace_service: WorkspaceService, workspace_context: WorkspaceContext, plugin_manager: PluginManager, args: Dict[str, Any]) -> None:
+        self.workspace_service = workspace_service
+        self.workspace_context = workspace_context
         self.plugin_manager = plugin_manager
         self.visualizer_id = args.get("visualizer_id")
         self.visualizer_config = args.get("visualizer_config", {})
@@ -168,9 +181,17 @@ class SelectVisualizerCommand(Command):
         if not self.visualizer_id:
             return False, "No visualizer id provided"
 
-        workspace = self.workspace_manager.get_workspace(self.workspace_id) if self.workspace_id else self.workspace_manager.get_active_workspace()
-        if workspace is None:
+        workspace_id = self.workspace_id if self.workspace_id else (
+            self.workspace_context.get_active_workspace().workspace_id 
+            if self.workspace_context.get_active_workspace() else None
+        )
+        
+        if not workspace_id:
             return False, "No active workspace"
+        
+        workspace = self.workspace_service.get_workspace(workspace_id)
+        if workspace is None:
+            return False, "Workspace not found"
 
         try:
             visualizer = self.plugin_manager.instantiate_visualizer(
@@ -186,17 +207,26 @@ class SelectVisualizerCommand(Command):
 
 
 class RefreshDataSourceCommand(Command):
-    def __init__(self, workspace_manager: WorkspaceManager, args: Optional[Dict[str, Any]] = None) -> None:
-        self.workspace_manager = workspace_manager
+    def __init__(self, workspace_service: WorkspaceService, workspace_context: WorkspaceContext, args: Optional[Dict[str, Any]] = None) -> None:
+        self.workspace_service = workspace_service
+        self.workspace_context = workspace_context
         self.args = args or {}
         workspace_id = self.args.get("workspace_id")
         self.workspace_id = str(workspace_id) if workspace_id is not None else None
         self.config = self.args.get("config")
 
     def execute(self) -> Tuple[bool, str]:
-        workspace = self.workspace_manager.get_workspace(self.workspace_id) if self.workspace_id else self.workspace_manager.get_active_workspace()
-        if workspace is None:
+        workspace_id = self.workspace_id if self.workspace_id else (
+            self.workspace_context.get_active_workspace().workspace_id 
+            if self.workspace_context.get_active_workspace() else None
+        )
+        
+        if not workspace_id:
             return False, "No active workspace"
+        
+        workspace = self.workspace_service.get_workspace(workspace_id)
+        if workspace is None:
+            return False, "Workspace not found"
 
         data_source_plugin = workspace.data_source_plugin
         if data_source_plugin is None:
