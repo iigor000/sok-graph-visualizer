@@ -18,7 +18,7 @@ def cli_env():
 def test_create_node(cli_env):
     app, parser = cli_env
 
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="TestWS")
+    workspace = app.workspace_service.create_workspace(name="TestWS", base_graph=Graph(graph_id="Test"))
 
     cmd = parser.parse("create node --id=1 --prop Name=Alice")
     
@@ -33,7 +33,7 @@ def test_create_node(cli_env):
 def test_edit_node(cli_env):
     app, parser = cli_env
 
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="EditWS")
+    workspace = app.workspace_service.create_workspace(name="EditWS", base_graph=Graph(graph_id="Test"))
     
     cmd = parser.parse("create node --id=1 --prop Name=Alice")
     app.command_processor.execute_command(cmd.name, cmd.params)
@@ -49,7 +49,7 @@ def test_edit_node(cli_env):
 
 def test_delete_node(cli_env):
     app, parser = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="DeleteWS")
+    workspace = app.workspace_service.create_workspace(name="DeleteWS", base_graph=Graph(graph_id="Test"))
     cmd = parser.parse("create node --id=1 --prop Name=Alice")
     app.command_processor.execute_command(cmd.name, cmd.params)
 
@@ -63,7 +63,7 @@ def test_delete_node(cli_env):
 
 def test_create_edge(cli_env):
     app, parser = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="EdgeWS")
+    workspace = app.workspace_service.create_workspace(name="EdgeWS", base_graph=Graph(graph_id="Test"))
 
     cmd = parser.parse("create node --id=1 --prop Name=Alice")
     app.command_processor.execute_command(cmd.name, cmd.params)
@@ -83,7 +83,7 @@ def test_create_edge(cli_env):
 
 def test_clear_graph(cli_env):
     app, parser = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="ClearWS")
+    workspace = app.workspace_service.create_workspace(name="ClearWS", base_graph=Graph(graph_id="Test"))
 
     cmd = parser.parse("create node --id=1 --prop Name=Alice")
     app.command_processor.execute_command(cmd.name, cmd.params)
@@ -100,7 +100,7 @@ def test_clear_graph(cli_env):
 
 def test_filter_and_search(cli_env):
     app, parser = cli_env
-    workspace = app.workspace_manager.create_workspace(base_graph=Graph(graph_id="Test"), name="FilterSearchWS")
+    workspace = app.workspace_service.create_workspace(name="FilterSearchWS", base_graph=Graph(graph_id="Test"))
 
     cmd = parser.parse("create node --id=1 --prop Name=Alice")
     app.command_processor.execute_command(cmd.name, cmd.params)

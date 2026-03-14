@@ -72,6 +72,9 @@ pip install -e "sok_graph_visualizer/rdf_datasource/" --quiet --upgrade
 echo "   Installing XML Datasource..."
 pip install -e "sok_graph_visualizer/xml_datasource/" --quiet --upgrade
 
+echo "   Installing JSON Datasource..."
+pip install -e "sok_graph_visualizer/json_data_source/" --quiet --upgrade
+
 echo "   Installing Django module..."
 pip install -e "sok_graph_visualizer/django/" --quiet --upgrade
 
@@ -104,8 +107,8 @@ run_server() {
         xterm -title "$TITLE" -e "cd '$PROJECT_ROOT' && source '$VENV_PATH/bin/activate' && $COMMAND; bash" &
     elif command -v konsole &> /dev/null; then
         konsole --title "$TITLE" -e bash -c "cd '$PROJECT_ROOT' && source '$VENV_PATH/bin/activate' && $COMMAND; bash" &
-    elif command -v open &> /dev/null; then
-        # macOS
+    elif [[ "$OSTYPE" == darwin* ]] && command -v open &> /dev/null; then
+        # macOS only
         open -a Terminal <<EOF
 cd '$PROJECT_ROOT'
 source '$VENV_PATH/bin/activate'

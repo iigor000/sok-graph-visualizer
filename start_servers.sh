@@ -47,8 +47,8 @@ run_server() {
         xterm -title "$TITLE" -e "cd '$PROJECT_ROOT' && source '$VENV_PATH/bin/activate' && $COMMAND; bash" &
     elif command -v konsole &> /dev/null; then
         konsole --title "$TITLE" -e bash -c "cd '$PROJECT_ROOT' && source '$VENV_PATH/bin/activate' && $COMMAND; bash" &
-    elif command -v open &> /dev/null; then
-        # macOS
+    elif [[ "$OSTYPE" == darwin* ]] && command -v open &> /dev/null; then
+        # macOS only
         open -a Terminal <<EOF
 cd '$PROJECT_ROOT'
 source '$VENV_PATH/bin/activate'

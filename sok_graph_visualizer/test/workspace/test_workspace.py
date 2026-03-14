@@ -1,5 +1,5 @@
 """
-Unit tests for Workspace and WorkspaceManager classes.
+Unit tests for Workspace and WorkspaceService classes.
 """
 
 import unittest
@@ -14,7 +14,7 @@ from sok_graph_visualizer.api.model.Graph import Graph
 from sok_graph_visualizer.api.model.Node import Node
 from sok_graph_visualizer.api.model.Edge import Edge
 from sok_graph_visualizer.core.src.workspace.workspace import Workspace
-from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
+from sok_graph_visualizer.core.src.use_cases.workspace_service import WorkspaceService
 from sok_graph_visualizer.core.src.workspace.operation import Operation
 
 
@@ -317,8 +317,8 @@ class TestWorkspace(unittest.TestCase):
         self.assertIs(ws.visualizer_plugin, visualizer_plugin)
 
 
-class TestWorkspaceManager(unittest.TestCase):
-    """Test cases for WorkspaceManager class."""
+class TestWorkspaceService(unittest.TestCase):
+    """Test cases for WorkspaceService class."""
     
     def setUp(self):
         """Set up test fixtures."""
@@ -328,22 +328,22 @@ class TestWorkspaceManager(unittest.TestCase):
         self.graph.add_edge(Edge("e1", "A", "B", {}))
     
     def test_manager_creation(self):
-        """Test creating a workspace manager."""
-        manager = WorkspaceManager()
+        """Test creating a workspace service."""
+        service = WorkspaceService()
         
-        self.assertEqual(len(manager.workspaces), 0)
-        self.assertIsNone(manager.active_workspace_id)
+        self.assertEqual(len(service.workspaces), 0)
+        self.assertIsNone(service.active_workspace_id)
     
     def test_create_workspace(self):
-        """Test creating a workspace through manager."""
-        manager = WorkspaceManager()
+        """Test creating a workspace through service."""
+        service = WorkspaceService()
         data_source_plugin = object()
         visualizer_plugin = object()
         
-        ws = manager.create_workspace(
+        ws = service.create_workspace(
+            name="Test Workspace",
             base_graph=self.graph,
             workspace_id="ws1",
-            name="Test Workspace",
             data_source_plugin=data_source_plugin,
             visualizer_plugin=visualizer_plugin
         )
@@ -351,126 +351,126 @@ class TestWorkspaceManager(unittest.TestCase):
         self.assertEqual(ws.workspace_id, "ws1")
         self.assertIs(ws.data_source_plugin, data_source_plugin)
         self.assertIs(ws.visualizer_plugin, visualizer_plugin)
-        self.assertEqual(len(manager.workspaces), 1)
-        self.assertEqual(manager.active_workspace_id, "ws1")
+        self.assertEqual(len(service.workspaces), 1)
+        self.assertEqual(service.active_workspace_id, "ws1")
     
     def test_create_workspace_auto_id(self):
         """Test creating workspace with auto-generated ID."""
-        manager = WorkspaceManager()
+        service = WorkspaceService()
         
-        ws = manager.create_workspace(base_graph=self.graph)
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph)
         
         self.assertIsNotNone(ws.workspace_id)
-        self.assertIn(ws.workspace_id, manager.workspaces)
+        self.assertIn(ws.workspace_id, service.workspaces)
     
     def test_create_workspace_duplicate_id(self):
         """Test creating workspace with duplicate ID."""
-        manager = WorkspaceManager()
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        service = WorkspaceService()
+        service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
         with self.assertRaises(ValueError) as context:
-            manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+            service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
         self.assertIn("already exists", str(context.exception))
     
     def test_create_workspace_not_active(self):
         """Test creating workspace without setting it active."""
-        manager = WorkspaceManager()
+        service = WorkspaceService()
         
-        ws1 = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
-        ws2 = manager.create_workspace(base_graph=self.graph, workspace_id="ws2", set_active=False)
+        ws1 = service.create_workspace(name="Workspace 1", base_graph=self.graph, workspace_id="ws1")
+        ws2 = service.create_workspace(name="Workspace 2", base_graph=self.graph, workspace_id="ws2", set_active=False)
         
-        self.assertEqual(manager.active_workspace_id, "ws1")
-        self.assertEqual(len(manager.workspaces), 2)
+        self.assertEqual(service.active_workspace_id, "ws1")
+        self.assertEqual(len(service.workspaces), 2)
     
     def test_delete_workspace(self):
         """Test deleting a workspace."""
-        manager = WorkspaceManager()
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        service = WorkspaceService()
+        service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
-        result = manager.delete_workspace("ws1")
+        result = service.remove_workspace("ws1")
         
         self.assertTrue(result)
-        self.assertEqual(len(manager.workspaces), 0)
-        self.assertIsNone(manager.active_workspace_id)
+        self.assertEqual(len(service.workspaces), 0)
+        self.assertIsNone(service.active_workspace_id)
     
     def test_delete_nonexistent_workspace(self):
         """Test deleting a workspace that doesn't exist."""
-        manager = WorkspaceManager()
+        service = WorkspaceService()
         
-        result = manager.delete_workspace("ws999")
+        result = service.remove_workspace("ws999")
         self.assertFalse(result)
     
     def test_delete_active_workspace_switches_to_another(self):
         """Test that deleting active workspace switches to another."""
-        manager = WorkspaceManager()
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws2")
+        service = WorkspaceService()
+        service.create_workspace(name="Workspace 1", base_graph=self.graph, workspace_id="ws1")
+        service.create_workspace(name="Workspace 2", base_graph=self.graph, workspace_id="ws2")
         
-        manager.set_active_workspace("ws1")
-        manager.delete_workspace("ws1")
+        service.set_active_workspace("ws1")
+        service.remove_workspace("ws1")
         
-        self.assertEqual(len(manager.workspaces), 1)
-        self.assertEqual(manager.active_workspace_id, "ws2")
+        self.assertEqual(len(service.workspaces), 1)
+        self.assertEqual(service.active_workspace_id, "ws2")
     
     def test_get_workspace(self):
         """Test getting a workspace by ID."""
-        manager = WorkspaceManager()
-        ws = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        service = WorkspaceService()
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
-        retrieved = manager.get_workspace("ws1")
+        retrieved = service.get_workspace("ws1")
         self.assertEqual(retrieved, ws)
         
-        not_found = manager.get_workspace("ws999")
+        not_found = service.get_workspace("ws999")
         self.assertIsNone(not_found)
     
     def test_get_active_workspace(self):
         """Test getting the active workspace."""
-        manager = WorkspaceManager()
-        ws = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        service = WorkspaceService()
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
-        active = manager.get_active_workspace()
+        active = service.get_active_workspace()
         self.assertEqual(active, ws)
     
     def test_get_active_workspace_none(self):
         """Test getting active workspace when none is active."""
-        manager = WorkspaceManager()
+        service = WorkspaceService()
         
-        active = manager.get_active_workspace()
+        active = service.get_active_workspace()
         self.assertIsNone(active)
     
     def test_set_active_workspace(self):
         """Test setting the active workspace."""
-        manager = WorkspaceManager()
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws2")
+        service = WorkspaceService()
+        service.create_workspace(name="Workspace 1", base_graph=self.graph, workspace_id="ws1")
+        service.create_workspace(name="Workspace 2", base_graph=self.graph, workspace_id="ws2")
         
-        result = manager.set_active_workspace("ws2")
+        result = service.set_active_workspace("ws2")
         self.assertTrue(result)
-        self.assertEqual(manager.active_workspace_id, "ws2")
+        self.assertEqual(service.active_workspace_id, "ws2")
     
     def test_set_active_workspace_invalid(self):
         """Test setting active workspace to invalid ID."""
-        manager = WorkspaceManager()
+        service = WorkspaceService()
         
-        result = manager.set_active_workspace("ws999")
+        result = service.set_active_workspace("ws999")
         self.assertFalse(result)
     
     def test_list_workspaces(self):
         """Test listing all workspaces."""
-        manager = WorkspaceManager()
-        ws1 = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
-        ws2 = manager.create_workspace(base_graph=self.graph, workspace_id="ws2")
+        service = WorkspaceService()
+        ws1 = service.create_workspace(name="Workspace 1", base_graph=self.graph, workspace_id="ws1")
+        ws2 = service.create_workspace(name="Workspace 2", base_graph=self.graph, workspace_id="ws2")
         
-        all_workspaces = manager.list_workspaces()
+        all_workspaces = service.get_workspaces()
         self.assertEqual(len(all_workspaces), 2)
         self.assertIn(ws1, all_workspaces)
         self.assertIn(ws2, all_workspaces)
     
     def test_reset_workspace(self):
-        """Test resetting a workspace through manager."""
-        manager = WorkspaceManager()
-        ws = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        """Test resetting a workspace through service."""
+        service = WorkspaceService()
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
         # Apply an operation
         modified_graph = Graph(graph_id="modified", directed=True)
@@ -479,80 +479,80 @@ class TestWorkspaceManager(unittest.TestCase):
         modified_graph.add_node(Node("C", {"name": "Node C"}))
         ws.apply_operation(modified_graph, "add_node")
         
-        # Reset via manager
-        result = manager.reset_workspace("ws1")
+        # Reset via service
+        result = service.reset_workspace("ws1")
         self.assertTrue(result)
         self.assertEqual(len(ws.operation_history), 0)
     
     def test_reset_active_workspace(self):
         """Test resetting active workspace without specifying ID."""
-        manager = WorkspaceManager()
-        ws = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        service = WorkspaceService()
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
         # Apply operation
         modified_graph = Graph(graph_id="modified", directed=True)
         ws.apply_operation(modified_graph, "test")
         
         # Reset without specifying ID
-        result = manager.reset_workspace()
+        result = service.reset_workspace()
         self.assertTrue(result)
         self.assertEqual(len(ws.operation_history), 0)
     
     def test_reset_nonexistent_workspace(self):
         """Test resetting workspace that doesn't exist."""
-        manager = WorkspaceManager()
+        service = WorkspaceService()
         
-        result = manager.reset_workspace("ws999")
+        result = service.reset_workspace("ws999")
         self.assertFalse(result)
     
     def test_undo_through_manager(self):
         """Test undo through manager."""
-        manager = WorkspaceManager()
-        ws = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        service = WorkspaceService()
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
         # Apply operation
         modified_graph = Graph(graph_id="modified", directed=True)
         ws.apply_operation(modified_graph, "test")
         
-        # Undo via manager
-        result = manager.undo("ws1")
+        # Undo via service
+        result = service.undo("ws1")
         self.assertTrue(result)
         self.assertEqual(ws.current_operation_index, -1)
     
     def test_undo_active_workspace(self):
         """Test undo on active workspace."""
-        manager = WorkspaceManager()
-        ws = manager.create_workspace(base_graph=self.graph)
+        service = WorkspaceService()
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph)
         
         modified_graph = Graph(graph_id="modified", directed=True)
         ws.apply_operation(modified_graph, "test")
         
-        result = manager.undo()  # No workspace_id specified
+        result = service.undo()  # No workspace_id specified
         self.assertTrue(result)
     
     def test_redo_through_manager(self):
         """Test redo through manager."""
-        manager = WorkspaceManager()
-        ws = manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
+        service = WorkspaceService()
+        ws = service.create_workspace(name="Workspace", base_graph=self.graph, workspace_id="ws1")
         
         modified_graph = Graph(graph_id="modified", directed=True)
         ws.apply_operation(modified_graph, "test")
-        ws.undo()
+        service.undo("ws1")
         
-        result = manager.redo("ws1")
+        result = service.redo("ws1")
         self.assertTrue(result)
         self.assertEqual(ws.current_operation_index, 0)
     
     def test_clear_all(self):
         """Test clearing all workspaces."""
-        manager = WorkspaceManager()
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws1")
-        manager.create_workspace(base_graph=self.graph, workspace_id="ws2")
+        service = WorkspaceService()
+        service.create_workspace(name="Workspace 1", base_graph=self.graph, workspace_id="ws1")
+        service.create_workspace(name="Workspace 2", base_graph=self.graph, workspace_id="ws2")
         
-        manager.clear_all()
+        service.clear_all()
         
-        self.assertEqual(len(manager.workspaces), 0)
-        self.assertIsNone(manager.active_workspace_id)
+        self.assertEqual(len(service.workspaces), 0)
+        self.assertIsNone(service.active_workspace_id)
 
 
 if __name__ == "__main__":
