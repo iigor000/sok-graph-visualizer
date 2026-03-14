@@ -1,11 +1,14 @@
 """
 Views for Graph Visualizer
 """
+import json
+
 from django.apps import apps
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from sok_graph_visualizer.core.src.commands.command_names import CommandNames
 
 
 def _get_app_config():
@@ -413,3 +416,112 @@ def get_graph_data(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({"error": str(e)}, status=500)
+@csrf_exempt
+@require_http_methods(["POST"])
+def filter(request):
+    """ 
+    Execute filter command over the active workspace
+    """
+    try:
+        data = json.loads(request.body)
+        expression = data.get("expression")
+
+        if not expression or not(isinstance(expression, str)):
+            return JsonResponse(
+                {"success" : False, "error" : "Filter expression is required!"},
+                status = 400
+            )
+        config = _get_app_config()
+        command_processor  = config.command_processor
+        success, message = command_processor.execute_command(CommandNames.FILTER, {"expression" : expression})
+        status_code = 200 if success else 400
+        return JsonResponse(
+            {"success": success, "message": message},
+            status=status_code,
+        )
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"success": False, "error": "Invalid JSON body."},
+            status=400,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"success": False, "error": str(e)},
+            status=500,
+        )
+        
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def search(request):
+    """ 
+    Execute search command over the active workspace
+    """
+    try:
+        data = json.loads(request.body)
+        expression = data.get("query")
+
+        if not expression or not(isinstance(expression, str)):
+            return JsonResponse(
+                {"success" : False, "error" : "Search expression is required!"},
+                status = 400,
+            )
+        
+        config = _get_app_config()
+        command_processor  = config.command_processor
+        success, message = command_processor.execute_command(CommandNames.SEARCH, {"expression" : expression})
+        status_code = 200 if success else 400
+        return JsonResponse(
+            {"success": success, "message": message},
+            status=status_code,
+        )
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"success": False, "error": "Invalid JSON body."},
+            status=400,
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"success": False, "error": str(e)},
+            status=500,
+        )
+ 
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def reset_graph(request):
+    """
+    Reset active workspace graph to the original base graph.
+    """
+    try:
+        config = _get_app_config()
+        workspace_manager = config.workspace_manager
+
+        if workspace_manager.active_workspace_id is None:
+            return JsonResponse(
+                {"success": False, "error": "No active workspace"},
+                status=400,
+            )
+
+        success = workspace_manager.reset_workspace()
+
+        if not success:
+            return JsonResponse(
+                {"success": False, "error": "Failed to reset workspace"},
+                status=400,
+            )
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "Graph reset to original state",
+            }
+        )
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse(
+            {"success": False, "error": str(e)},
+            status=500,
+        )
