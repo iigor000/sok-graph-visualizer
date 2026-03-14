@@ -30,7 +30,7 @@ class XmlDataSourceService(DataSourcePlugin):
     Usage example
     -------------
     plugin = XmlDataSourceService(config={
-        "file_path": "xml_datasource/data/cyclic_transit_network.xml",
+        "file_path": "sok_graph_visualizer/xml_datasource/data/graph.xml",
         "directed": "true",
         "reference_attr": "reference",
     })
@@ -47,7 +47,14 @@ class XmlDataSourceService(DataSourcePlugin):
         return {
             "file_path": "Path to the XML file to parse.",
         }
-
+    
+    def get_optional_config(self) -> Dict[str, str]:
+        return {
+        "directed": "Whether the graph is directed (default: true)",
+        "reference_attr": "XML attribute name for cyclic references (default: reference)",
+        "max_depth": "Maximum nesting depth to parse (default: unlimited)",
+    }
+    
     def parse(self) -> Graph:
         """
         Parse the configured XML file and return a Graph.

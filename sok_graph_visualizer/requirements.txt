@@ -1,3 +1,8 @@
-Django
-jinja2
-rdflib
+Django>=4.2
+Flask>=3.0.0
+Jinja2>=3.0
+rdflib>=6.0.0
+Werkzeug>=3.0.0
+click>=8.1.0
+typing-extensions>=4.0.0
+lxml

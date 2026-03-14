@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "graph-api"
+name = "api"
 version = "0.1.0"
 description = "API library for Graph Visualization Platform"
 readme = "README.md"

@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "graph-simple-visualizer"
+name = "simple-visualizer"
 version = "0.1.0"
 description = "Simple HTML visualizer plugin for Graph Visualization Platform"
 readme = "README.md"
@@ -11,11 +11,11 @@ requires-python = ">=3.8"
 license = {text = "MIT"}
 
 dependencies = [
-    "graph-api>=0.1.0",
+    "api>=0.1.0",
     "Jinja2>=3.0",
 ]
 
-[project.entry-points."graph.data_visualizer"]
+[project.entry-points."graph.visualizer"]
 simple_visualizer = "sok_graph_visualizer.simple_visualizer.src.simple_visualizer:SimpleVisualizer"
 
 [tool.setuptools.packages.find]

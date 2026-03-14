@@ -1,0 +1,31 @@
+Metadata-Version: 2.4
+Name: sok-graph-visualizer
+Version: 0.1.0
+Summary: SOK Graph Visualization Platform
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: Jinja2>=3.0
+Provides-Extra: api
+Requires-Dist: graph-api>=0.1.0; extra == "api"
+Provides-Extra: core
+Requires-Dist: graph-platform>=0.1.0; extra == "core"
+Provides-Extra: visualizers
+Requires-Dist: graph-api>=0.1.0; extra == "visualizers"
+Requires-Dist: Jinja2>=3.0; extra == "visualizers"
+Provides-Extra: django
+Requires-Dist: Django>=4.2; extra == "django"
+Requires-Dist: graph-platform>=0.1.0; extra == "django"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: black>=22.0; extra == "dev"
+Requires-Dist: flake8>=4.0; extra == "dev"
+
+# Projekat iz Softverskih Obrazaca i Komponenti
+
+Članovi tima:
+- Sara Cvjetković SV78/2023
+- Andjela Broćeta SV75/2023
+- Elena Vuković SV77/2023
+- Mia Uglješić SV22/2023
+- Igor Novaković SV29/2023

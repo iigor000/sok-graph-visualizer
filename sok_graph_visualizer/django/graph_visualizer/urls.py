@@ -12,6 +12,7 @@ urlpatterns = [
 
     # API endpoints
     path('api/workspaces/', views.list_workspaces, name='api_list_workspaces'),
+    path('api/workspace/graph', views.get_graph_data, name='api_get_graph_data'),
     path('api/workspace/<int:workspace_id>/', views.get_workspace, name='api_get_workspace'),
     path('api/workspace/<int:workspace_id>/activate', views.activate_workspace, name='api_activate_workspace'),
     path('api/workspace/visualizer/', views.set_visualizer, name='api_set_visualizer'),
@@ -19,6 +20,9 @@ urlpatterns = [
     path('api/plugins/visualizers/', views.list_visualizer_plugins, name='api_list_visualizer_plugins'),
     path('api/cli/execute/', views.execute_cli_command, name='api_cli_execute'),
 
+    path('api/search/', views.search, name = 'api_search_graph' ),
+    path('api/filter/', views.filter, name = 'api_filter_graph'),
+    path('api/workspace/reset/', views.reset_graph, name='api_reset_graph'),
     # Health check
     path('health/', views.health, name='health'),
 ]

@@ -3,12 +3,12 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "graph-xml-datasource"
+name = "xml-datasource"
 version = "1.0.0"
 description = "XML data source plugin for Graph Visualization Platform"
 requires-python = ">=3.8"
 dependencies = [
-    "graph-api",
+    "api",
     "lxml>=4.9.0",
 ]
 readme = "README.md"

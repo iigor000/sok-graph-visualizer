@@ -4,7 +4,7 @@
 // Build arrays from API model dicts
 var nodes = [
   {% for nid, node in graph_nodes.items() %}
-    { id: "{{ nid }}", name: "{{ node.attributes.get('name', node.node_id) }}", attr: {{ node.attributes | tojson }} },
+    { id: "{{ nid }}", name: "{{ node.name }}", attr: {{ node.attributes | tojson }} },
   {% endfor %}
 ];
 
@@ -194,4 +194,9 @@ window.addEventListener('resize', () => {
   simulation.force('y', d3.forceY(h / 2).strength(0.01));
   simulation.alpha(0.5).restart();
 });
+
+window.highlightMainNode = function(nodeId) {
+    svg.selectAll('rect').attr('fill', '#000');
+    node.filter(d => d.id === nodeId).select('rect').attr('fill', 'red');
+};
 
