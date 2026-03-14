@@ -52,17 +52,17 @@ Alternatively, you can install each module manually using the Python module inst
 
 ```bash
 # Install core requirements
-python -m pip install -r sok_graph_visualizer/requirements.txt
+pip install -r sok_graph_visualizer/requirements.txt
 
 # Install all modules in editable mode
-python -m pip install -e .
-python -m pip install -e sok_graph_visualizer/api/
-python -m pip install -e sok_graph_visualizer/core/
-python -m pip install -e sok_graph_visualizer/simple_visualizer/
-python -m pip install -e sok_graph_visualizer/block_visualizer/
-python -m pip install -e sok_graph_visualizer/rdf_datasource/
-python -m pip install -e sok_graph_visualizer/xml_datasource/
-python -m pip install -e sok_graph_visualizer/json_data_source/
+pip install -e .
+pip install -e sok_graph_visualizer/api/
+pip install -e sok_graph_visualizer/core/
+pip install -e sok_graph_visualizer/simple_visualizer/
+pip install -e sok_graph_visualizer/block_visualizer/
+pip install -e sok_graph_visualizer/rdf_datasource/
+pip install -e sok_graph_visualizer/xml_datasource/
+pip install -e sok_graph_visualizer/json_data_source/
 ```
 
 ## Web Interface
@@ -91,7 +91,7 @@ The platform features an **embedded Command Line Interface (CLI)** for programma
 
 Below are examples of supported CLI commands.
 
-### **Node Commands**
+### **Commands**
 ```bash
 create node --id=1 --prop Name=Alice --prop Age=25
 edit node --id=1 --prop Age=40
