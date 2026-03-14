@@ -1,5 +1,6 @@
 README.md
 pyproject.toml
+run.sh
 setup.sh
 start_servers.sh
 ./sok_graph_visualizer/__init__.py
@@ -55,9 +56,11 @@ sok_graph_visualizer/core/src/commands/graph_commands/edit_node_command.py
 sok_graph_visualizer/core/src/graph_query/__init__.py
 sok_graph_visualizer/core/src/graph_query/graph_query_service.py
 sok_graph_visualizer/core/src/use_cases/plugin_recognition.py
-sok_graph_visualizer/core/src/use_cases/render_service.py
 sok_graph_visualizer/core/src/web/static/css/style.css
+sok_graph_visualizer/core/src/web/static/js/birdView.js
 sok_graph_visualizer/core/src/web/static/js/main.js
+sok_graph_visualizer/core/src/web/static/js/mainView.js
+sok_graph_visualizer/core/src/web/static/js/tree.js
 sok_graph_visualizer/core/src/web/static/js/workspace.js
 sok_graph_visualizer/core/src/web/templates/base.html
 sok_graph_visualizer/core/src/web/templates/index.html
@@ -69,7 +72,7 @@ sok_graph_visualizer/core/src/workspace/workspace_manager.py
 sok_graph_visualizer/django/.gitignore
 sok_graph_visualizer/django/README.md
 sok_graph_visualizer/django/manage.py
-sok_graph_visualizer/django/requirements.txt
+sok_graph_visualizer/django/pyproject.toml
 sok_graph_visualizer/django/graph_visualizer/__init__.py
 sok_graph_visualizer/django/graph_visualizer/admin.py
 sok_graph_visualizer/django/graph_visualizer/apps.py
@@ -89,11 +92,10 @@ sok_graph_visualizer/flask/.gitignore
 sok_graph_visualizer/flask/README.md
 sok_graph_visualizer/flask/app.py
 sok_graph_visualizer/flask/config.py
-sok_graph_visualizer/flask/requirements.txt
+sok_graph_visualizer/flask/pyproject.toml
 sok_graph_visualizer/flask/run.py
 sok_graph_visualizer/json_data_source/__init__.py
 sok_graph_visualizer/json_data_source/pyproject.toml
-sok_graph_visualizer/json_data_source/setup.py
 sok_graph_visualizer/json_data_source/data/graph.json
 sok_graph_visualizer/json_data_source/src/__init__.py
 sok_graph_visualizer/json_data_source/src/implementation.py
@@ -126,7 +128,6 @@ sok_graph_visualizer/test/workspace/test_workspace_commands.py
 sok_graph_visualizer/test/xml_datasource/test_xml_plugin.py
 sok_graph_visualizer/xml_datasource/__init__.py
 sok_graph_visualizer/xml_datasource/pyproject.toml
-sok_graph_visualizer/xml_datasource/data/graph.xml
 sok_graph_visualizer/xml_datasource/data/graph1.xml
 sok_graph_visualizer/xml_datasource/src/__init__.py
 sok_graph_visualizer/xml_datasource/src/implementation.py

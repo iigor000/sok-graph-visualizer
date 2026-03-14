@@ -65,6 +65,10 @@ echo "7. Installing XML Datasource..."
 pip install -e "sok_graph_visualizer/xml_datasource/" --quiet --upgrade
 echo "   ✓ graph-xml-datasource installed"
 
+echo "8. Installing JSON Datasource..."
+pip install -e "sok_graph_visualizer/json_data_source/" --quiet --upgrade
+echo "   ✓ graph-json-datasource installed"
+
 echo ""
 echo "=========================================="
 echo "✓ Setup complete!"

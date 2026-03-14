@@ -17,22 +17,21 @@ Provides workspace management functionality including:
 #### Module Structure
 ```
 workspace/
-├── __init__.py          # Package exports
-├── operation.py         # Operation class
-├── workspace.py         # Workspace class
-└── workspace_manager.py # WorkspaceManager class
+├── __init__.py      # Package exports
+├── operation.py     # Operation class
+└── workspace.py     # Workspace class
 ```
 
 #### Quick Start
 ```python
-from platform.src.workspace import WorkspaceManager
+from use_cases.workspace_service import WorkspaceService
 from api.model.Graph import Graph
 
-# Create manager
-manager = WorkspaceManager()
+# Create service
+service = WorkspaceService()
 
 # Create workspace
-workspace = manager.create_workspace(
+workspace = service.create_workspace(
     base_graph=my_graph,
     name="My Workspace"
 )
@@ -45,11 +44,11 @@ workspace.apply_operation(
 )
 
 # Undo/Redo
-workspace.undo()
-workspace.redo()
+service.undo()
+service.redo()
 ```
 
-See inline documentation in [operation.py](src/workspace/operation.py), [workspace.py](src/workspace/workspace.py), and [workspace_manager.py](src/workspace/workspace_manager.py) for detailed API reference.
+See inline documentation in [operation.py](src/workspace/operation.py), [workspace.py](src/workspace/workspace.py), and [workspace_service.py](src/use_cases/workspace_service.py) for detailed API reference.
 
 ## Testing
 

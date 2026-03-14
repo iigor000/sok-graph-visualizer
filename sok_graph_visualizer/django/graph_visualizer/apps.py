@@ -7,7 +7,7 @@ class GraphExplorerConfig(AppConfig):
     Django AppConfig for the Graph Explorer application.
 
     This class initializes the core application (`App`) when Django starts
-    and exposes its main services (workspace manager, command processor, etc.) 
+    and exposes its main services (workspace service, command processor, etc.) 
     to Django views.
     """
 
@@ -19,16 +19,21 @@ class GraphExplorerConfig(AppConfig):
         Called once when Django starts.
 
         Here we create the core application instance which initializes:
-        - WorkspaceManager
+        - WorkspaceService
         - CommandProcessor
         - registered commands
         """
         self.core_app = App()
 
     @property
-    def workspace_manager(self):
-        """Return the WorkspaceManager instance."""
-        return self.core_app.workspace_manager
+    def workspace_context(self):
+        """Return the WorkspaceContext instance."""
+        return self.core_app.workspace_context
+
+    @property
+    def workspace_service(self):
+        """Return the WorkspaceService instance."""
+        return self.core_app.workspace_service
 
     @property
     def command_processor(self):

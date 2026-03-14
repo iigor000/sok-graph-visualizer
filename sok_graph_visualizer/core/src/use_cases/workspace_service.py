@@ -1,23 +1,24 @@
 """
-WorkspaceManager class for managing multiple workspaces.
+WorkspaceService - provides workspace management functionality.
+
+Manages workspaces in memory without database persistence.
 """
 
-from typing import Dict, Optional, Any, List
+from typing import List, Optional, Dict, Any
 import uuid
+from datetime import datetime
 
-from .workspace import Workspace
+from sok_graph_visualizer.core.src.workspace.workspace import Workspace
 from sok_graph_visualizer.api.service.DataSourceService import DataSourcePlugin
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
 
 
-class WorkspaceManager:
+class WorkspaceService:
     """
-    Manages multiple workspaces.
+    Service for managing workspaces.
     
-    The WorkspaceManager is responsible for:
-    - Creating and deleting workspaces
-    - Switching between workspaces
-    - Managing workspace lifecycle
+    Provides CRUD operations for workspaces without database persistence.
+    All workspaces are stored in memory (no persistence between restarts).
     
     Attributes:
         workspaces (Dict[str, Workspace]): Dictionary mapping workspace IDs to Workspace objects
@@ -25,38 +26,41 @@ class WorkspaceManager:
     """
     
     def __init__(self):
-        """Initialize a WorkspaceManager."""
+        """Initialize the workspace service with empty storage."""
         self.workspaces: Dict[str, Workspace] = {}
         self.active_workspace_id: Optional[str] = None
     
     def create_workspace(
         self,
-        base_graph,
-        workspace_id: Optional[str] = None,
-        name: str = "",
+        name: str,
+        base_graph=None,
         data_source_plugin: Optional[DataSourcePlugin] = None,
         visualizer_plugin: Optional[VisualizerPlugin] = None,
         metadata: Optional[Dict[str, Any]] = None,
+        workspace_id: Optional[str] = None,
         set_active: bool = True
     ) -> Workspace:
         """
         Create a new workspace.
         
         Args:
-            base_graph: The initial graph for the workspace
-            workspace_id: Unique identifier (auto-generated if not provided)
-            name: Human-readable name
-            data_source_plugin: Active data source plugin for the workspace
-            visualizer_plugin: Active visualizer plugin for the workspace
+            name: Name of the workspace
+            base_graph: The initial graph (required)
+            data_source_plugin: Active data source plugin
+            visualizer_plugin: Active visualizer plugin
             metadata: Additional metadata
+            workspace_id: Custom workspace ID (auto-generated if not provided)
             set_active: Whether to set this as the active workspace
             
         Returns:
-            The created Workspace object
+            Created Workspace object
             
         Raises:
-            ValueError: If workspace_id already exists
+            ValueError: If workspace_id already exists or base_graph is missing
         """
+        if base_graph is None:
+            raise ValueError("base_graph is required to create a workspace")
+        
         if workspace_id is None:
             workspace_id = str(uuid.uuid4())
         
@@ -79,7 +83,28 @@ class WorkspaceManager:
         
         return workspace
     
-    def delete_workspace(self, workspace_id: str) -> bool:
+    def get_workspace(self, workspace_id: str) -> Optional[Workspace]:
+        """
+        Get a workspace by ID.
+        
+        Args:
+            workspace_id: ID of the workspace
+            
+        Returns:
+            Workspace object or None if not found
+        """
+        return self.workspaces.get(workspace_id)
+    
+    def get_workspaces(self) -> List[Workspace]:
+        """
+        Get all workspaces.
+        
+        Returns:
+            List of all Workspace objects
+        """
+        return list(self.workspaces.values())
+    
+    def remove_workspace(self, workspace_id: str) -> bool:
         """
         Delete a workspace.
         
@@ -87,7 +112,7 @@ class WorkspaceManager:
             workspace_id: ID of the workspace to delete
             
         Returns:
-            bool: True if workspace was deleted, False if not found
+            True if successful, False if workspace not found
         """
         if workspace_id not in self.workspaces:
             return False
@@ -103,24 +128,12 @@ class WorkspaceManager:
         
         return True
     
-    def get_workspace(self, workspace_id: str) -> Optional[Workspace]:
-        """
-        Get a workspace by ID.
-        
-        Args:
-            workspace_id: ID of the workspace
-            
-        Returns:
-            Workspace object or None if not found
-        """
-        return self.workspaces.get(workspace_id)
-    
     def get_active_workspace(self) -> Optional[Workspace]:
         """
         Get the currently active workspace.
         
         Returns:
-            Active Workspace object or None if no active workspace
+            Active Workspace object or None
         """
         if self.active_workspace_id:
             return self.workspaces.get(self.active_workspace_id)
@@ -134,7 +147,7 @@ class WorkspaceManager:
             workspace_id: ID of the workspace to activate
             
         Returns:
-            bool: True if successful, False if workspace not found
+            True if successful, False if workspace not found
         """
         if workspace_id not in self.workspaces:
             return False
@@ -142,14 +155,59 @@ class WorkspaceManager:
         self.active_workspace_id = workspace_id
         return True
     
-    def list_workspaces(self) -> List[Workspace]:
+    def update_workspace(
+        self,
+        workspace_id: str,
+        name: Optional[str] = None,
+        data_source_plugin: Optional[DataSourcePlugin] = None,
+        visualizer_plugin: Optional[VisualizerPlugin] = None
+    ) -> Optional[Workspace]:
         """
-        Get a list of all workspaces.
+        Update workspace properties.
+        
+        Args:
+            workspace_id: ID of the workspace to update
+            name: New name (if provided)
+            data_source_plugin: New data source plugin (if provided)
+            visualizer_plugin: New visualizer plugin (if provided)
+            
+        Returns:
+            Updated Workspace object or None if not found
+        """
+        workspace = self.get_workspace(workspace_id)
+        if workspace is None:
+            return None
+        
+        if name is not None:
+            workspace.name = name
+        if data_source_plugin is not None:
+            workspace.data_source_plugin = data_source_plugin
+        if visualizer_plugin is not None:
+            workspace.visualizer_plugin = visualizer_plugin
+        
+        workspace.modified_at = datetime.now()
+        return workspace
+    
+    def has_workspaces(self) -> bool:
+        """
+        Check if there are any workspaces.
         
         Returns:
-            List of Workspace objects
+            True if at least one workspace exists
         """
-        return list(self.workspaces.values())
+        return len(self.get_workspaces()) > 0
+    
+    def is_last_workspace(self, workspace_id: str) -> bool:
+        """
+        Check if this is the last remaining workspace.
+        
+        Args:
+            workspace_id: ID of the workspace to check
+            
+        Returns:
+            True if only one workspace exists
+        """
+        return len(self.get_workspaces()) <= 1
     
     def reset_workspace(self, workspace_id: Optional[str] = None) -> bool:
         """
@@ -226,7 +284,8 @@ class WorkspaceManager:
         self.active_workspace_id = None
     
     def __repr__(self) -> str:
+        """Return string representation of the service."""
         return (
-            f"WorkspaceManager(workspaces={len(self.workspaces)}, "
+            f"WorkspaceService(workspaces={len(self.workspaces)}, "
             f"active={self.active_workspace_id})"
         )

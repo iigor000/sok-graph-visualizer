@@ -153,7 +153,33 @@ function renderWorkspaceList(workspaces) {
         const item = document.createElement('div');
         item.className = `workspace-item ${workspace.active ? 'active' : ''}`;
         item.dataset.workspaceId = workspace.id;
-        item.textContent = workspace.name;
+        
+        const content = document.createElement('div');
+        content.className = 'workspace-item-content';
+        
+        const name = document.createElement('span');
+        name.className = 'workspace-item-name';
+        name.textContent = workspace.name;
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'workspace-item-delete';
+        deleteBtn.type = 'button';
+        deleteBtn.dataset.workspaceId = workspace.id;
+        deleteBtn.dataset.workspaceName = workspace.name;
+        deleteBtn.title = 'Delete workspace';
+        deleteBtn.innerHTML = '<span class="delete-icon">✕</span>';
+        
+        // Add direct click listener to delete button
+        deleteBtn.addEventListener('click', (e) => {
+            console.log('[DEBUG] Direct button click listener triggered');
+            e.stopPropagation();
+            e.preventDefault();
+            openDeleteModal(workspace.id, workspace.name);
+        });
+        
+        content.appendChild(name);
+        content.appendChild(deleteBtn);
+        item.appendChild(content);
 
         item.addEventListener('click', async () => {
             try {
@@ -213,12 +239,79 @@ async function createWorkspace(payload) {
     }
 }
 
+function openDeleteModal(workspaceId, workspaceName) {
+    console.log('[DEBUG] openDeleteModal called with:', { workspaceId, workspaceName });
+    const modal = document.getElementById('delete-workspace-modal');
+    const nameElement = document.getElementById('delete-workspace-name');
+    const confirmBtn = document.getElementById('confirm-delete-workspace');
+    
+    console.log('[DEBUG] Modal elements:', { modal, nameElement, confirmBtn });
+    
+    if (!modal || !nameElement || !confirmBtn) {
+        console.error('[ERROR] Delete modal elements not found');
+        return;
+    }
+    
+    nameElement.textContent = workspaceName;
+    modal.hidden = false;
+    console.log('[DEBUG] Modal opened');
+    
+    // Remove old event listeners and attach new one
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    newConfirmBtn.addEventListener('click', async () => {
+        console.log('[DEBUG] Confirm delete clicked');
+        try {
+            clearFeedback();
+            await deleteWorkspaceApi(workspaceId);
+            closeDeleteModal();
+            await refreshWorkspaces();
+            showFeedback('Workspace deleted successfully', false);
+        } catch (error) {
+            console.error('[ERROR] Delete failed:', error);
+            showFeedback(error.message, true);
+        }
+    });
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('delete-workspace-modal');
+    if (!modal) {
+        return;
+    }
+    modal.hidden = true;
+}
+
+async function deleteWorkspaceApi(workspaceId) {
+    const response = await fetch(`/api/workspaces/${workspaceId}`, {
+        method: 'DELETE',
+        headers: getJsonHeaders()
+    });
+
+    const text = await response.text();
+    
+    try {
+        const body = JSON.parse(text);
+        if (!response.ok) {
+            throw new Error(body.error || 'Failed to delete workspace');
+        }
+        return body;
+    } catch (parseError) {
+        throw new Error('Failed to delete workspace - invalid response: ' + parseError.message);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const openModalButton = document.getElementById('open-create-workspace-modal');
     const modal = document.getElementById('create-workspace-modal');
     const closeElements = document.querySelectorAll('[data-close-modal="true"]');
     const form = document.getElementById('create-workspace-form');
     const dataSourceSelect = document.getElementById('data-source-select');
+    
+    // Setup delete modal close handlers
+    const deleteModal = document.getElementById('delete-workspace-modal');
+    const deleteCloseElements = deleteModal ? deleteModal.querySelectorAll('[data-close-modal="true"]') : [];
 
     if (!openModalButton || !modal || !form || !dataSourceSelect) {
         return;
@@ -250,10 +343,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     closeElements.forEach((element) => {
         element.addEventListener('click', closeModal);
     });
+    
+    // Setup delete modal close handlers
+    deleteCloseElements.forEach((element) => {
+        element.addEventListener('click', closeDeleteModal);
+    });
 
     dataSourceSelect.addEventListener('change', () => {
         const selectedPlugin = plugins.find((plugin) => plugin.id === dataSourceSelect.value);
         renderConfigFields(selectedPlugin);
+    });
+
+    // Event delegation for workspace item delete buttons (both static and dynamic)
+    const workspaceList = document.getElementById('workspace-list');
+    if (workspaceList) {
+        console.log('[DEBUG] Setting up event delegation for delete buttons');
+        workspaceList.addEventListener('click', (e) => {
+            console.log('[DEBUG] Click event on workspace-list', e.target);
+            const deleteBtn = e.target.closest('.workspace-item-delete');
+            console.log('[DEBUG] Closest delete btn:', deleteBtn);
+            if (deleteBtn) {
+                e.stopPropagation();
+                e.preventDefault();
+                const workspaceId = deleteBtn.dataset.workspaceId;
+                const workspaceName = deleteBtn.dataset.workspaceName;
+                console.log('[DEBUG] Delete button clicked via delegation', { workspaceId, workspaceName });
+                if (workspaceId && workspaceName) {
+                    openDeleteModal(workspaceId, workspaceName);
+                }
+            }
+        });
+    } else {
+        console.log('[ERROR] workspace-list element not found');
+    }
+    
+    // Also handle static delete buttons from template if they exist
+    const staticDeleteBtns = document.querySelectorAll('.workspace-item-delete');
+    console.log('[DEBUG] Found', staticDeleteBtns.length, 'static delete buttons');
+    staticDeleteBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            console.log('[DEBUG] Static delete button clicked');
+            e.stopPropagation();
+            e.preventDefault();
+            const workspaceId = btn.dataset.workspaceId;
+            const workspaceName = btn.dataset.workspaceName;
+            if (workspaceId && workspaceName) {
+                openDeleteModal(workspaceId, workspaceName);
+            }
+        });
     });
 
     form.addEventListener('submit', async (event) => {

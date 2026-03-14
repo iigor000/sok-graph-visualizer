@@ -169,9 +169,10 @@ body {
 .btn {
   border: none;
   border-radius: 4px;
-  padding: 9px 14px;
+  padding: 10px 18px;
   font-size: 13px;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .btn-primary {
@@ -229,7 +230,7 @@ body {
 
 .workspace-modal-content {
   position: relative;
-  width: min(560px, 92vw);
+  width: min(700px, 95vw);
   background: white;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
@@ -240,7 +241,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -253,16 +254,16 @@ body {
 }
 
 .workspace-form {
-  padding: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .form-field label {
@@ -274,15 +275,48 @@ body {
 .form-field select {
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   font-size: 13px;
 }
 
+.workspace-modal-body {
+  padding: 20px 20px;
+  color: var(--text-color);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.workspace-modal-body p {
+  margin: 0 0 10px 0;
+}
+
+.workspace-modal-body p:last-child {
+  margin-bottom: 0;
+}
+
 .workspace-modal-actions {
-  margin-top: 6px;
+  padding: 16px 20px;
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+  background-color: #fafafa;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
 }
 
 /* Middle panel - Tree view and Bird view */
@@ -595,6 +629,82 @@ body {
   .middle-panel {
     flex-direction: column;
   }
+}
+
+/* Workspace Item with Delete Button */
+.workspace-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.workspace-item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-item-delete {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.4);
+  padding: 2px 4px;
+  border-radius: 2px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workspace-item-delete:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--danger-color);
+}
+
+.workspace-item.active .workspace-item-delete {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.workspace-item.active .workspace-item-delete:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.delete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Danger Button */
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Modal Body */
+.workspace-modal-body {
+  padding: 16px;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.workspace-modal-body p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+}
+
+.workspace-modal-body p:last-child {
+  margin-bottom: 0;
 }
 
 /* ── Tree View additions ─────────────────────────────────────── */
