@@ -47,9 +47,9 @@ def activate_workspace(request, workspace_id):
     try:
         config = _get_app_config()
         command_processor = config.command_processor
-        workspace_manager = config.workspace_manager
+        workspace_context = config.workspace_context
         
-        # Execute the SELECT_WORKSPACE command to activate in workspace manager
+        # Execute the SELECT_WORKSPACE command to activate in workspace context
         success, message = command_processor.execute_command('select_workspace', {
             'workspace_id': workspace_id
         })
@@ -91,14 +91,15 @@ def render_graph_view(request):
     Render the graph of the active workspace.
     """
     config = _get_app_config()
-    workspace_manager = config.workspace_manager
+    workspace_context = config.workspace_context
+    workspace_service = config.workspace_service
 
     try:
         # Get active workspace
-        if workspace_manager.active_workspace_id is None:
+        if workspace_context.current_workspace_id is None:
             return JsonResponse({"error": "No active workspace", "success": False}, status=400)
         
-        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
+        workspace = workspace_service.get_workspace(workspace_context.current_workspace_id)
         if workspace is None:
             return JsonResponse({"error": "Active workspace not found", "success": False}, status=400)
         
@@ -127,18 +128,20 @@ def list_workspaces(request):
     List all workspaces (GET) or create a new workspace (POST) - API endpoint.
     """
     config = _get_app_config()
-    workspace_manager = config.workspace_manager
+    workspace_context = config.workspace_context
+    workspace_service = config.workspace_service
     command_processor = config.command_processor
     
     if request.method == 'GET':
         try:
             # Return list of all workspaces
             workspaces = []
-            for workspace_id, workspace in workspace_manager.workspaces.items():
+            active_id = workspace_context.current_workspace_id
+            for workspace in workspace_service.get_workspaces():
                 workspaces.append({
                     'id': workspace.workspace_id,
                     'name': workspace.name,
-                    'active': workspace_manager.active_workspace_id == workspace_id,
+                    'active': active_id == workspace.workspace_id,
                     'nodes': len(workspace.current_graph.nodes) if workspace.current_graph else 0,
                     'edges': len(workspace.current_graph.edges) if workspace.current_graph else 0,
                 })
@@ -172,8 +175,8 @@ def list_workspaces(request):
                 return JsonResponse({'error': message}, status=400)
             
             # Get the newly created workspace
-            workspace_id = workspace_manager.active_workspace_id
-            workspace = workspace_manager.workspaces.get(workspace_id)
+            workspace_id = workspace_context.current_workspace_id
+            workspace = workspace_service.get_workspace(workspace_id)
             
             if workspace is None:
                 return JsonResponse({'error': 'Workspace created but not found'}, status=500)
@@ -320,7 +323,8 @@ def set_visualizer(request):
         
         config = _get_app_config()
         command_processor = config.command_processor
-        workspace_manager = config.workspace_manager
+        workspace_context = config.workspace_context
+        workspace_service = config.workspace_service
         
         # Execute the SELECT_VISUALIZER command
         success, message = command_processor.execute_command('select_visualizer', {
@@ -331,10 +335,10 @@ def set_visualizer(request):
             return JsonResponse({'success': False, 'error': message}, status=400)
         
         # Now render the graph with the new visualizer
-        if workspace_manager.active_workspace_id is None:
+        if workspace_context.current_workspace_id is None:
             return JsonResponse({'error': 'No active workspace', 'success': False}, status=400)
         
-        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
+        workspace = workspace_service.get_workspace(workspace_context.current_workspace_id)
         if workspace is None:
             return JsonResponse({'error': 'Active workspace not found', 'success': False}, status=400)
         
@@ -433,12 +437,13 @@ def get_graph_data(request):
     """
     try:
         config = _get_app_config()
-        workspace_manager = config.workspace_manager
+        workspace_context = config.workspace_context
+        workspace_service = config.workspace_service
 
-        if workspace_manager.active_workspace_id is None:
+        if workspace_context.current_workspace_id is None:
             return JsonResponse({"error": "No active workspace"}, status=404)
 
-        workspace = workspace_manager.workspaces.get(workspace_manager.active_workspace_id)
+        workspace = workspace_service.get_workspace(workspace_context.current_workspace_id)
         if workspace is None or workspace.current_graph is None:
             return JsonResponse({"error": "No graph loaded"}, status=404)
 
@@ -545,15 +550,27 @@ def reset_graph(request):
     """
     try:
         config = _get_app_config()
-        workspace_manager = config.workspace_manager
+        workspace_context = config.workspace_context
+        workspace_service = config.workspace_service
 
-        if workspace_manager.active_workspace_id is None:
+        if workspace_context.current_workspace_id is None:
             return JsonResponse(
                 {"success": False, "error": "No active workspace"},
                 status=400,
             )
 
-        success = workspace_manager.reset_workspace()
+        workspace = workspace_service.get_workspace(workspace_context.current_workspace_id)
+        if workspace is None:
+            return JsonResponse(
+                {"success": False, "error": "Workspace not found"},
+                status=400,
+            )
+
+        try:
+            workspace.reset()
+            success = True
+        except Exception as e:
+            success = False
 
         if not success:
             return JsonResponse(
@@ -575,3 +592,40 @@ def reset_graph(request):
             {"success": False, "error": str(e)},
             status=500,
         )
+
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_workspace(request, workspace_id):
+    """
+    Delete a workspace by ID - API endpoint.
+    """
+    try:
+        config = _get_app_config()
+        workspace_context = config.workspace_context
+        workspace_service = config.workspace_service
+        
+        workspace_id = str(workspace_id)
+        
+        # Check if workspace exists
+        workspace = workspace_service.get_workspace(workspace_id)
+        if workspace is None:
+            return JsonResponse({'error': f'Workspace not found: {workspace_id}'}, status=404)
+        
+        # Delete the workspace
+        workspace_service.remove_workspace(workspace_id)
+        
+        # If deleted workspace was active, clear the session
+        if workspace_context.current_workspace_id == workspace_id:
+            workspace_context.current_workspace_id = None
+            if 'active_workspace_id' in request.session:
+                del request.session['active_workspace_id']
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Workspace {workspace.name} deleted successfully'
+        }, status=200)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'error': f'Failed to delete workspace: {str(e)}'}, status=500)

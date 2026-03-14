@@ -12,6 +12,7 @@ urlpatterns = [
 
     # API endpoints
     path('api/workspaces/', views.list_workspaces, name='api_list_workspaces'),
+    path('api/workspaces/<str:workspace_id>', views.delete_workspace, name='api_delete_workspace'),
     path('api/workspace/graph', views.get_graph_data, name='api_get_graph_data'),
     path('api/workspace/<int:workspace_id>/', views.get_workspace, name='api_get_workspace'),
     path('api/workspace/<int:workspace_id>/activate', views.activate_workspace, name='api_activate_workspace'),

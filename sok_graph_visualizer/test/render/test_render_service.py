@@ -14,7 +14,7 @@ from sok_graph_visualizer.api.model.Graph import Graph
 from sok_graph_visualizer.api.model.Node import Node
 from sok_graph_visualizer.api.model.Edge import Edge
 from sok_graph_visualizer.api.service.DataVisualizerService import VisualizerPlugin
-from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
+from sok_graph_visualizer.core.src.use_cases.workspace_service import WorkspaceService
 from sok_graph_visualizer.core.src.use_cases.render_service import RenderService
 
 
@@ -38,29 +38,29 @@ class TestRenderServiceInit(unittest.TestCase):
     """Tests for RenderService initialisation."""
 
     def setUp(self):
-        self.wm = WorkspaceManager()
+        self.ws = WorkspaceService()
         self.graph = Graph("g1", "Graph 1")
-        self.wm.create_workspace(self.graph, workspace_id="ws1")
+        self.ws.create_workspace(name="ws1", base_graph=self.graph, workspace_id="ws1")
 
     def test_default_visualizer_is_none(self):
-        rs = RenderService(self.wm)
+        rs = RenderService(self.ws)
         self.assertIsNone(rs.visualizer)
 
     def test_visualizer_set_via_constructor(self):
         vis = MockVisualizer()
-        rs = RenderService(self.wm, visualizer=vis)
+        rs = RenderService(self.ws, visualizer=vis)
         self.assertIs(rs.visualizer, vis)
 
     def test_set_visualizer(self):
-        rs = RenderService(self.wm)
+        rs = RenderService(self.ws)
         vis = MockVisualizer()
         rs.set_visualizer(vis)
         self.assertIs(rs.visualizer, vis)
 
     def test_workspace_visualizer_is_used(self):
-        rs = RenderService(self.wm)
+        rs = RenderService(self.ws)
         vis = MockVisualizer()
-        workspace = self.wm.get_active_workspace()
+        workspace = self.ws.get_active_workspace()
         workspace.set_visualizer_plugin(vis)
 
         result = rs.render_active_workspace()
@@ -72,14 +72,14 @@ class TestRenderServiceRender(unittest.TestCase):
     """Tests for render_active_workspace."""
 
     def setUp(self):
-        self.wm = WorkspaceManager()
+        self.ws = WorkspaceService()
         self.graph = Graph("g1", "Graph 1")
         self.graph.add_node(Node("A", {"name": "Node A"}))
         self.graph.add_node(Node("B", {"name": "Node B"}))
         self.graph.add_edge(Edge("e1", "A", "B", {}))
-        self.wm.create_workspace(self.graph, workspace_id="ws1")
+        self.ws.create_workspace(name="ws1", base_graph=self.graph, workspace_id="ws1")
         self.vis = MockVisualizer()
-        self.rs = RenderService(self.wm, visualizer=self.vis)
+        self.rs = RenderService(self.ws, visualizer=self.vis)
 
     def test_render_returns_string(self):
         result = self.rs.render_active_workspace()
@@ -91,19 +91,19 @@ class TestRenderServiceRender(unittest.TestCase):
         self.assertIn('data-node-id="B"', result)
 
     def test_render_raises_without_active_workspace(self):
-        self.wm.active_workspace_id = None
+        self.ws.active_workspace_id = None
         with self.assertRaises(RuntimeError):
             self.rs.render_active_workspace()
 
     def test_render_raises_without_visualizer(self):
-        rs = RenderService(self.wm)
+        rs = RenderService(self.ws)
         with self.assertRaises(RuntimeError):
             rs.render_active_workspace()
 
     def test_render_uses_workspace_visualizer_when_service_has_none(self):
-        workspace = self.wm.get_active_workspace()
+        workspace = self.ws.get_active_workspace()
         workspace.set_visualizer_plugin(MockVisualizer())
-        rs = RenderService(self.wm)
+        rs = RenderService(self.ws)
 
         result = rs.render_active_workspace()
 
@@ -111,14 +111,14 @@ class TestRenderServiceRender(unittest.TestCase):
         self.assertIn('data-node-id="B"', result)
 
     def test_render_raises_when_active_workspace_missing(self):
-        self.wm.active_workspace_id = "nonexistent"
+        self.ws.active_workspace_id = "nonexistent"
         with self.assertRaises(RuntimeError):
             self.rs.render_active_workspace()
 
     def test_render_empty_graph(self):
         empty_graph = Graph("empty", "Empty")
-        self.wm.create_workspace(empty_graph, workspace_id="ws_empty")
-        self.wm.active_workspace_id = "ws_empty"
+        self.ws.create_workspace(name="ws_empty", base_graph=empty_graph, workspace_id="ws_empty")
+        self.ws.active_workspace_id = "ws_empty"
         result = self.rs.render_active_workspace()
         self.assertIsInstance(result, str)
 
@@ -127,11 +127,11 @@ class TestRenderServiceHooks(unittest.TestCase):
     """Tests for pre_render / post_render hooks."""
 
     def setUp(self):
-        self.wm = WorkspaceManager()
+        self.ws = WorkspaceService()
         self.graph = Graph("g1", "Graph 1")
         self.graph.add_node(Node("A", {}))
-        self.wm.create_workspace(self.graph, workspace_id="ws1")
-        self.rs = RenderService(self.wm, visualizer=MockVisualizer())
+        self.ws.create_workspace(name="ws1", base_graph=self.graph, workspace_id="ws1")
+        self.rs = RenderService(self.ws, visualizer=MockVisualizer())
 
     def test_pre_render_hook_called(self):
         called = []

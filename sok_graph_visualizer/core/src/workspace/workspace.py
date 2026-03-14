@@ -152,35 +152,6 @@ class Workspace:
         self.selected_node_id = None
         self.modified_at = datetime.now()
     
-    def reapply_pipeline(self, operations: List[Operation]) -> None:
-        """
-        Reapply a pipeline of operations.
-        
-        Note: This is a placeholder. Actual implementation would require
-        storing graph snapshots or having reversible operations.
-        
-        Args:
-            operations: List of operations to reapply
-        """
-        # This would require the actual transformation logic from plugins
-        # For now, this is a placeholder that shows the intended structure
-        raise NotImplementedError(
-            "Reapply pipeline requires plugin execution context. "
-            "Use WorkspaceManager.reapply_operations() instead."
-        )
-    
-    def _rebuild_current_graph(self) -> None:
-        """
-        Rebuild the current graph based on the current operation index.
-        
-        Note: This is a simplified version. Real implementation would require
-        either storing graph snapshots at each step or having reversible operations.
-        """
-        # For now, this method assumes we have graph snapshots
-        # In a full implementation, this would replay operations from base_graph
-        # or use stored snapshots
-        pass
-    
     def can_undo(self) -> bool:
         """Check if undo is possible."""
         return self.current_operation_index >= 0

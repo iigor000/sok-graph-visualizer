@@ -16,7 +16,8 @@ from sok_graph_visualizer.core.src.commands.workspace_commands import RefreshDat
 from sok_graph_visualizer.core.src.commands.workspace_commands import SelectVisualizerCommand
 from sok_graph_visualizer.core.src.commands.workspace_commands import SelectWorkspaceCommand
 from sok_graph_visualizer.core.src.commands.workspace_commands import UpdateWorkspaceCommand
-from sok_graph_visualizer.core.src.workspace.workspace_manager import WorkspaceManager
+from sok_graph_visualizer.core.src.use_cases.workspace_service import WorkspaceService
+from sok_graph_visualizer.core.src.use_cases.workspace_context import WorkspaceContext
 
 
 class CountingDataSourcePlugin(DataSourcePlugin):
@@ -58,29 +59,32 @@ class FakePluginManager:
 
 class TestWorkspaceCommands(unittest.TestCase):
     def setUp(self):
-        self.workspace_manager = WorkspaceManager()
+        self.workspace_service = WorkspaceService()
+        self.workspace_context = WorkspaceContext(self.workspace_service)
         self.plugin_manager = FakePluginManager()
 
         initial_graph = Graph(graph_id="initial", name="Initial")
         initial_graph.add_node(Node("N0", {"name": "Node 0"}))
-        self.workspace_manager.create_workspace(initial_graph, workspace_id="ws0", name="Workspace 0")
+        self.workspace_service.create_workspace(name="Workspace 0", base_graph=initial_graph, workspace_id="ws0")
+        self.workspace_context.select_workspace("ws0")
 
     def test_select_workspace_command(self):
         second_graph = Graph(graph_id="second", name="Second")
         second_graph.add_node(Node("N1", {"name": "Node 1"}))
-        self.workspace_manager.create_workspace(second_graph, workspace_id="ws1", name="Workspace 1", set_active=False)
+        self.workspace_service.create_workspace(name="Workspace 1", base_graph=second_graph, workspace_id="ws1", set_active=False)
 
-        command = SelectWorkspaceCommand(self.workspace_manager, {"workspace_id": "ws1"})
+        command = SelectWorkspaceCommand(self.workspace_context, {"workspace_id": "ws1"})
 
         success, message = command.execute()
 
         self.assertTrue(success)
         self.assertEqual(message, "Selected workspace Workspace 1")
-        self.assertEqual(self.workspace_manager.active_workspace_id, "ws1")
+        self.assertEqual(self.workspace_context.current_workspace_id, "ws1")
 
     def test_create_workspace_command(self):
         command = CreateWorkspaceCommand(
-            self.workspace_manager,
+            self.workspace_service,
+            self.workspace_context,
             self.plugin_manager,
             {
                 "workspace_id": "ws2",
@@ -92,21 +96,22 @@ class TestWorkspaceCommands(unittest.TestCase):
         )
 
         success, message = command.execute()
-        workspace = self.workspace_manager.get_workspace("ws2")
+        workspace = self.workspace_service.get_workspace("ws2")
 
         self.assertTrue(success)
         self.assertEqual(message, "Created workspace Workspace 2")
         self.assertEqual(workspace.current_graph.graph_id, "graph_B")
         self.assertIsInstance(workspace.data_source_plugin, CountingDataSourcePlugin)
         self.assertIsInstance(workspace.visualizer_plugin, BasicVisualizerPlugin)
-        self.assertEqual(self.workspace_manager.active_workspace_id, "ws2")
+        self.assertEqual(self.workspace_context.current_workspace_id, "ws2")
 
     def test_update_workspace_command(self):
-        workspace = self.workspace_manager.get_workspace("ws0")
+        workspace = self.workspace_service.get_workspace("ws0")
         workspace.apply_operation(workspace.current_graph, "test")
 
         command = UpdateWorkspaceCommand(
-            self.workspace_manager,
+            self.workspace_service,
+            self.workspace_context,
             self.plugin_manager,
             {
                 "workspace_id": "ws0",
@@ -130,18 +135,18 @@ class TestWorkspaceCommands(unittest.TestCase):
     def test_delete_workspace_command(self):
         second_graph = Graph(graph_id="second", name="Second")
         second_graph.add_node(Node("N1", {"name": "Node 1"}))
-        self.workspace_manager.create_workspace(second_graph, workspace_id="ws1", name="Workspace 1", set_active=False)
+        self.workspace_service.create_workspace(name="Workspace 1", base_graph=second_graph, workspace_id="ws1", set_active=False)
 
-        command = DeleteWorkspaceCommand(self.workspace_manager, {"workspace_id": "ws1"})
+        command = DeleteWorkspaceCommand(self.workspace_context, {"workspace_id": "ws1"})
 
         success, message = command.execute()
 
         self.assertTrue(success)
         self.assertEqual(message, "Successfully removed the workspace")
-        self.assertIsNone(self.workspace_manager.get_workspace("ws1"))
+        self.assertIsNone(self.workspace_service.get_workspace("ws1"))
 
     def test_delete_workspace_command_rejects_last_workspace(self):
-        command = DeleteWorkspaceCommand(self.workspace_manager, {"workspace_id": "ws0"})
+        command = DeleteWorkspaceCommand(self.workspace_context, {"workspace_id": "ws0"})
 
         success, message = command.execute()
 
@@ -150,24 +155,24 @@ class TestWorkspaceCommands(unittest.TestCase):
 
     def test_select_visualizer_command(self):
         command = SelectVisualizerCommand(
-            self.workspace_manager,
+            self.workspace_context,
             self.plugin_manager,
             {"visualizer_id": "basic_vis"},
         )
 
         success, message = command.execute()
-        workspace = self.workspace_manager.get_active_workspace()
+        workspace = self.workspace_context.get_active_workspace()
 
         self.assertTrue(success)
         self.assertEqual(message, "Selected Basic Visualizer as visualizer")
         self.assertIsInstance(workspace.visualizer_plugin, BasicVisualizerPlugin)
 
     def test_refresh_data_source_command(self):
-        workspace = self.workspace_manager.get_active_workspace()
+        workspace = self.workspace_context.get_active_workspace()
         workspace.set_data_source_plugin(CountingDataSourcePlugin(config={"suffix": "R1"}))
         workspace.apply_operation(workspace.current_graph, "test")
 
-        command = RefreshDataSourceCommand(self.workspace_manager, {"config": {"suffix": "R2"}})
+        command = RefreshDataSourceCommand(self.workspace_service, {"config": {"suffix": "R2"}})
 
         success, message = command.execute()
 
