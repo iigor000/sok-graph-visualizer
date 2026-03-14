@@ -24,6 +24,75 @@ document.addEventListener("DOMContentLoaded", async function () {
   bindFilterControls();
   bindResetGraphControl();
 
+  const cliModal = document.getElementById('cli-modal');
+  const cliInput = document.getElementById('cli-input');
+  const cliStatusView = document.getElementById('cli-status-view');
+  const cliHistoryView = document.getElementById('cli-history');
+  const openCliBtn = document.getElementById('open-cli-btn');
+
+  if (openCliBtn && cliInput) {
+    openCliBtn.onclick = () => {
+      cliModal.hidden = false;
+      cliInput.focus();
+    };
+
+    const closeCLI = () => {
+      cliModal.hidden = true;
+      cliInput.value = "";
+      if (cliStatusView) {
+        cliStatusView.textContent = "Waiting for command..."; 
+      }
+      if (cliHistoryView) {
+        cliHistoryView.innerHTML = "";
+      }
+    };
+
+    const closeX = document.getElementById('cli-close-x');
+    const backdrop = document.getElementById('cli-close-backdrop');
+    if (closeX) closeX.onclick = closeCLI;
+    if (backdrop) backdrop.onclick = closeCLI;
+
+    cliInput.addEventListener('keypress', async function(e) {
+      if (e.key === 'Enter') {
+        const command = this.value.trim();
+        if (!command) return;
+
+        cliHistoryView.innerHTML += `<div class="cli-row"><span class="cli-prompt">user@graph:~$</span> ${command}</div>`;
+        this.value = '';
+
+        try {
+          const csrfToken = getCsrfToken();
+          const response = await fetch('/api/cli/execute/', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
+            },
+            body: JSON.stringify({ command: command })
+          });
+
+          const data = await response.json();
+
+          if (data.status_text) {
+            cliStatusView.textContent = data.status_text;
+            cliStatusView.scrollTop = 0; 
+          }
+
+          const statusClass = data.success ? 'cli-success' : 'cli-error';
+          cliHistoryView.innerHTML += `<div class="${statusClass}">> ${data.message}</div>`;
+          cliHistoryView.scrollTop = cliHistoryView.scrollHeight;
+
+          if (data.success) {
+            console.log("[CLI] Success, refreshing graph...");
+            await refreshGraph();
+          }
+        } catch (err) {
+          cliHistoryView.innerHTML += `<div style="color: red">System error: ${err}</div>`;
+        }
+      }
+    });
+  }
+
   // Load visualizer plugins
   try {
     await loadVisualizerPlugins();

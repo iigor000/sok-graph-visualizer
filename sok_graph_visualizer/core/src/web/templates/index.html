@@ -60,25 +60,10 @@ Visualizer{% endblock %} {% block content %}
         <p>Main graph visualization will appear here</p>
         {% endif %}
       </div>
+      <div class="main-view-footer" style="padding: 10px; text-align: right;">
+        <button id="open-cli-btn" class="btn btn-secondary">Open CLI Terminal</button>
+      </div>
     </div>
-    <!-- Right Panel: Main View and Filters -->
-    <div class="right-panel">
-        <!-- Main View -->
-        <div class="main-view">
-            <div class="main-view-header">
-                <h3>Main View</h3>
-            </div>
-            <div class="main-view-content" id="main-view-canvas">
-                {% if graph_html %}
-                    {{ graph_html | safe }}
-                {% else %}
-                    <p>Main graph visualization will appear here</p>
-                {% endif %}
-            </div>
-            <div class="main-view-footer" style="padding: 10px; text-align: right;">
-                <button id="open-cli-btn" class="btn btn-secondary">Open CLI Terminal</button>
-            </div>
-        </div>
 
     <!-- Bottom panels: Visualizer Selection and Filters -->
     <div class="bottom-panels">
