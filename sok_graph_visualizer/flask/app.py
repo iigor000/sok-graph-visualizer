@@ -214,25 +214,28 @@ def delete_workspace(workspace_id: str):
     try:
         workspace_id = str(workspace_id)
         
-        # Check if workspace exists
-        workspace = workspace_service.get_workspace(workspace_id)
-        if workspace is None:
-            return jsonify({'error': f'Workspace not found: {workspace_id}'}), 404
+        # Execute the DELETE_WORKSPACE command
+        success, message = command_processor.execute_command('delete_workspace', {
+            'workspace_id': workspace_id
+        })
         
-        # Delete the workspace
-        workspace_service.remove_workspace(workspace_id)
+        if not success:
+            return jsonify({
+                'success': False,
+                'error': message
+            }), 400
         
-        # If deleted workspace was active, clear the session
-        if workspace_context.current_workspace_id == workspace_id:
-            workspace_context.current_workspace_id = None
-            if 'active_workspace_id' in session:
-                del session['active_workspace_id']
+        # Clear session if deleted workspace was active
+        if 'active_workspace_id' in session:
+            del session['active_workspace_id']
         
         return jsonify({
             'success': True,
-            'message': f'Workspace {workspace.name} deleted successfully'
+            'message': message
         }), 200
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': f'Failed to delete workspace: {str(e)}'}), 500
 
 
@@ -486,7 +489,7 @@ def execute_cli_command():
         data = request.get_json()
         command_str = data.get('command')
         
-        workspace = workspace_manager.get_active_workspace()
+        workspace = workspace_context.get_active_workspace()
         if not workspace:
             return jsonify({'success': False, 'message': 'No active workspace found.'})
 

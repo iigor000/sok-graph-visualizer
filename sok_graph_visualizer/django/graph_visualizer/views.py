@@ -398,7 +398,7 @@ def execute_cli_command(request):
         graph_html = ""
 
         if success:
-            workspace = config.workspace_manager.get_active_workspace()
+            workspace = config.workspace_context.get_active_workspace()
             if workspace:
                 graph = workspace.current_graph
                 lines = [f"--- Current Graph State ---"]
@@ -603,27 +603,28 @@ def delete_workspace(request, workspace_id):
     try:
         config = _get_app_config()
         workspace_context = config.workspace_context
-        workspace_service = config.workspace_service
+        command_processor = config.command_processor
         
         workspace_id = str(workspace_id)
         
-        # Check if workspace exists
-        workspace = workspace_service.get_workspace(workspace_id)
-        if workspace is None:
-            return JsonResponse({'error': f'Workspace not found: {workspace_id}'}, status=404)
+        # Execute the DELETE_WORKSPACE command
+        success, message = command_processor.execute_command('delete_workspace', {
+            'workspace_id': workspace_id
+        })
         
-        # Delete the workspace
-        workspace_service.remove_workspace(workspace_id)
+        if not success:
+            return JsonResponse({
+                'success': False,
+                'error': message
+            }, status=400)
         
-        # If deleted workspace was active, clear the session
-        if workspace_context.current_workspace_id == workspace_id:
-            workspace_context.current_workspace_id = None
-            if 'active_workspace_id' in request.session:
-                del request.session['active_workspace_id']
+        # Clear session if deleted workspace was active
+        if 'active_workspace_id' in request.session:
+            del request.session['active_workspace_id']
         
         return JsonResponse({
             'success': True,
-            'message': f'Workspace {workspace.name} deleted successfully'
+            'message': message
         }, status=200)
     except Exception as e:
         import traceback
