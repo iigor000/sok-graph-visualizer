@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/workspace/visualizer/', views.set_visualizer, name='api_set_visualizer'),
     path('api/plugins/data-sources/', views.list_data_source_plugins, name='api_list_data_source_plugins'),
     path('api/plugins/visualizers/', views.list_visualizer_plugins, name='api_list_visualizer_plugins'),
+    path('api/cli/execute/', views.execute_cli_command, name='api_cli_execute'),
 
     path('api/search/', views.search, name = 'api_search_graph' ),
     path('api/filter/', views.filter, name = 'api_filter_graph'),

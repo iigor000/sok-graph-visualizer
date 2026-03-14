@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from sok_graph_visualizer.core.src.cli.cli_parser import CLIParser
 from sok_graph_visualizer.core.src.commands.command_names import CommandNames
 
 
@@ -378,6 +379,55 @@ def set_visualizer(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def execute_cli_command(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST allowed"}, status=405)
+    
+    try:
+        body = json.loads(request.body)
+        command_str = body.get('command')
+        config = _get_app_config()
+        parser = CLIParser()
+        
+        parsed = parser.parse(command_str)
+        success, message = config.command_processor.execute_command(parsed.name, parsed.params)
+        
+        status_text = ""
+        graph_html = ""
+
+        if success:
+            workspace = config.workspace_context.get_active_workspace()
+            if workspace:
+                graph = workspace.current_graph
+                lines = [f"--- Current Graph State ---"]
+                lines.append(f"Nodes ({len(graph.nodes)}):")
+                for node in graph.nodes.values():
+                    attr_str = ", ".join([f"{k}: {v}" for k, v in node.attributes.items()])
+                    lines.append(f"  [ID: {node.node_id}]  {'{' + attr_str + '}'}")
+                
+                lines.append(f"\nEdges ({len(graph.edges)}):")
+                for edge in graph.edges.values():
+                    arrow = "->" if graph.directed else "--"
+                    edge_attr = f"  | {edge.attributes}" if edge.attributes else ""
+                    lines.append(f"  ({edge.edge_id}): {edge.source} {arrow} {edge.target}{edge_attr}")
+                
+                status_text = "\n".join(lines)
+                
+                if workspace.visualizer_plugin:
+                    graph_html = workspace.visualizer_plugin.render(graph)
+        else:
+            status_text = f"Command failed: {message}"
+
+        return JsonResponse({
+            'success': success,
+            'message': message,
+            'status_text': status_text,
+            'graph_html': graph_html
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'status_text': f"Error: {str(e)}"}, status=500)
     
 @require_http_methods(["GET"])
 def get_graph_data(request):
@@ -553,27 +603,28 @@ def delete_workspace(request, workspace_id):
     try:
         config = _get_app_config()
         workspace_context = config.workspace_context
-        workspace_service = config.workspace_service
+        command_processor = config.command_processor
         
         workspace_id = str(workspace_id)
         
-        # Check if workspace exists
-        workspace = workspace_service.get_workspace(workspace_id)
-        if workspace is None:
-            return JsonResponse({'error': f'Workspace not found: {workspace_id}'}, status=404)
+        # Execute the DELETE_WORKSPACE command
+        success, message = command_processor.execute_command('delete_workspace', {
+            'workspace_id': workspace_id
+        })
         
-        # Delete the workspace
-        workspace_service.remove_workspace(workspace_id)
+        if not success:
+            return JsonResponse({
+                'success': False,
+                'error': message
+            }, status=400)
         
-        # If deleted workspace was active, clear the session
-        if workspace_context.current_workspace_id == workspace_id:
-            workspace_context.current_workspace_id = None
-            if 'active_workspace_id' in request.session:
-                del request.session['active_workspace_id']
+        # Clear session if deleted workspace was active
+        if 'active_workspace_id' in request.session:
+            del request.session['active_workspace_id']
         
         return JsonResponse({
             'success': True,
-            'message': f'Workspace {workspace.name} deleted successfully'
+            'message': message
         }, status=200)
     except Exception as e:
         import traceback

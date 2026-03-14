@@ -71,3 +71,27 @@
         </div>
     </div>
 </div>
+
+<div id="cli-modal" class="workspace-modal" hidden>
+    <div class="workspace-modal-backdrop" id="cli-close-backdrop"></div>
+    <div class="workspace-modal-content cli-terminal-container">
+        <div class="workspace-modal-header">
+            <h3>Command Line Interface</h3>
+            <button type="button" class="workspace-modal-close" id="cli-close-x">&times;</button>
+        </div>
+
+        <div class="cli-body">
+            <div id="cli-status-view" class="cli-status-view">
+                <p class="text-muted">Graph data will be displayed here after first command...</p>
+            </div>
+
+            <div class="cli-input-zone">
+                <div id="cli-history" class="cli-history"></div>
+                <div class="cli-input-wrapper">
+                    <span class="cli-prompt">user@graph:~$</span>
+                    <input type="text" id="cli-input" autofocus placeholder="Type command...">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

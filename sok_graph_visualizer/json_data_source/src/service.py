@@ -181,7 +181,10 @@ class JsonGraphParserService:
     def parse(self, data: Dict, graph: Graph):
         self.graph = graph
         self._collect_ids(data)
-        root_obj = data.get("root", data)
+        if isinstance(data, dict):
+            root_obj = data.get("root", data)
+        else:
+            root_obj = data
         self._build(root_obj)
 
         for edge in self.pending_edges:

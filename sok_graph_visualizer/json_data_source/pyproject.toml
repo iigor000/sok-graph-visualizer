@@ -10,6 +10,7 @@ requires-python = ">=3.8"
 dependencies = [
     "api",
 ]
+license = {text = "MIT"}
 
 [project.entry-points."graph.data_source"]
 json_datasource = "sok_graph_visualizer.json_data_source.src.implementation:JsonDataSourcePlugin"

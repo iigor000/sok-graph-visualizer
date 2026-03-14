@@ -33,8 +33,12 @@ class JsonDataSourcePlugin(DataSourcePlugin):
         with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        directed = data.get("directed", True)
-        graph_id = data.get("graph_id", "json_graph")
+        if isinstance(data, list):
+            directed = True
+            graph_id = "json_graph"
+        else:
+            directed = data.get("directed", True)
+            graph_id = data.get("graph_id", "json_graph")
 
         graph = Graph(
             graph_id=graph_id,

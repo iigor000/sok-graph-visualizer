@@ -1,4 +1,5 @@
 import shlex
+import threading
 from .cli_command import CLICommand
 from datetime import datetime, date
 
@@ -14,6 +15,20 @@ class CLIParser:
     It also attempts to automatically convert property values to their
     appropriate Python types (int, float, date, datetime) for downstream use.
     """
+    _instance = None
+    _lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super(CLIParser, cls).__new__(cls)
+        return cls._instance
+    
+    def __init__(self):
+        if hasattr(self, '_initialized'):
+            return
+        self._initialized = True
 
     def parse(self, command_str: str) -> CLICommand:
         """
@@ -78,11 +93,12 @@ class CLIParser:
         Attempt to convert a string value to int, float, datetime, or date.
 
         Conversion order:
-            1. int
-            2. float
-            3. datetime.fromisoformat
-            4. date.fromisoformat
-            5. fallback: leave as string
+            1. true/false
+            2. int
+            3. float
+            4. datetime.fromisoformat
+            5. date.fromisoformat
+            6. fallback: leave as string
 
         Args:
             value (str): The raw string value from the CLI.
@@ -91,6 +107,10 @@ class CLIParser:
             int, float, datetime, date, or str: The converted value in the
                                                  appropriate Python type.
         """
+        val_lower = value.lower()
+        if val_lower == "true": return True
+        if val_lower == "false": return False
+
         try:
             return int(value)
         except ValueError:
